@@ -23,6 +23,7 @@ function Humacchina(audioContext, params) {
 		// TODO create oscillators, set octave
 		for(var i = 0; i < numColumns; i++) {
 			var osc = new OscillatorVoice(audioContext);
+			osc.octave = i;
 			osc.output.connect(gainNode);
 			oscillators.push(osc);
 		}
@@ -35,7 +36,7 @@ function Humacchina(audioContext, params) {
 	
 	this.play = function() {
 		// TODO
-		oscillators[0].noteOn(48, 0.5, audioContext.currentTime);
+		oscillators[5].noteOn(48, 0.5, audioContext.currentTime);
 	};
 
 	this.stop = function() {
