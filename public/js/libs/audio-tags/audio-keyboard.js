@@ -1,170 +1,177 @@
 (function () {
 
-    'use strict';
+	'use strict';
 
-    function initLayout(kb) {
-        
-        var numBlacks = kb.blacks.length;
+	function initLayout(kb) {
 
-        kb.innerHTML = '';
-        kb.classList.add('keyboard');
-        
-        for(var i = 0; i < kb.numOctaves; i++) {
+		var numBlacks = kb.blacks.length;
 
-            for(var j = 0; j < numBlacks; j++) {
+		kb.innerHTML = '';
+		kb.classList.add('keyboard');
 
-                var isBlack = kb.blacks[j],
-                    keyDiv = document.createElement( 'div' ),
-                    index = j + numBlacks * i,
-                    label = kb.keyboardLayout[ index ];
+		for(var i = 0; i < kb.octaves; i++) {
 
-                keyDiv.className = isBlack ? kb.keyBlackClass : kb.keyClass;
-                keyDiv.innerHTML = label;
-                keyDiv.dataset.index = index;
+			for(var j = 0; j < numBlacks; j++) {
 
-                keyDiv.addEventListener('mousedown', makeCallback(kb, onDivMouseDown), false);
-                keyDiv.addEventListener('mouseup', makeCallback(kb, onDivMouseUp), false);
+				var isBlack = kb.blacks[j],
+				keyDiv = document.createElement( 'div' ),
+				index = j + numBlacks * i,
+				label = kb.keyboardLayout[ index ];
 
-                kb.keys.push( keyDiv );
+				keyDiv.className = isBlack ? kb.keyBlackClass : kb.keyClass;
+				keyDiv.innerHTML = label;
+				keyDiv.dataset.index = index;
 
-                kb.appendChild( keyDiv );
+				keyDiv.addEventListener('mousedown', makeCallback(kb, onDivMouseDown), false);
+				keyDiv.addEventListener('mouseup', makeCallback(kb, onDivMouseUp), false);
 
-            }
-        }
+				kb.keys.push( keyDiv );
 
-        kb.tabIndex = 1; // TODO what if there's more than one kb
-        kb.addEventListener('keydown', makeCallback(kb, onKeyDown), false);
-        kb.addEventListener('keyup', makeCallback(kb, onKeyUp), false);
+				kb.appendChild( keyDiv );
 
-    }
+			}
+		}
 
+		kb.tabIndex = 1; // TODO what if there's more than one kb
+		kb.addEventListener('keydown', makeCallback(kb, onKeyDown), false);
+		kb.addEventListener('keyup', makeCallback(kb, onKeyUp), false);
 
-    function makeCallback(kb, fn) {
-
-        var cb = function(e) {
-            fn(kb, e);
-        };
-
-        return cb;
-
-    }
+	}
 
 
-    function onDivMouseDown( keyboard, ev ) {
+	function makeCallback(kb, fn) {
 
-        if( keyboard.keyPressed ) {
-            return;
-        }
+		var cb = function(e) {
+			fn(kb, e);
+		};
 
-        var key = ev.target;
+		return cb;
 
-        dispatchNoteOn( keyboard, key.dataset.index );
-
-    }
+	}
 
 
-    function onDivMouseUp( keyboard, ev ) {
+	function onDivMouseDown( keyboard, ev ) {
 
-        if( keyboard.keyPressed ) {
-            dispatchNoteOff( keyboard );
-        }
+		if( keyboard.keyPressed ) {
+			return;
+		}
 
-    }
+		var key = ev.target;
 
+		dispatchNoteOn( keyboard, key.dataset.index );
 
-    function onKeyDown( keyboard, e ) {
-
-        console.log('REAL keydown');
-        var index = findKeyIndex( keyboard, e );
-
-        if( keyboard.keyPressed ) {
-            return;
-        }
-
-        if( index === -1 || e.altKey || e.altGraphKey || e.ctrlKey || e.metaKey || e.shiftKey ) {
-            // no further processing
-            return;
-        }
-
-        dispatchNoteOn( keyboard, index );
-
-    }
+	}
 
 
-    function onKeyUp( keyboard, e ) {
+	function onDivMouseUp( keyboard, ev ) {
 
-        // Only fire key up if the key is in the defined layout
-        if( findKeyIndex( keyboard, e ) !== -1 ) {
-            dispatchNoteOff( keyboard );
-        }
+		if( keyboard.keyPressed ) {
+			dispatchNoteOff( keyboard );
+		}
 
-    }
-
-
-    function findKeyIndex( keyboard, e ) {
-
-        var keyCode = e.keyCode || e.which,
-            keyChar = String.fromCharCode( keyCode ),
-            index = keyboard.keyboardLayout.indexOf( keyChar );
-
-        return index;
-
-    }
+	}
 
 
-    function dispatchNoteOn( keyboard, index ) {
-        console.log('down', keyboard);
+	function onKeyDown( keyboard, e ) {
 
-        keyboard.keyPressed = true;
+		var index = findKeyIndex( keyboard, e );
 
-        var key = keyboard.keys[index],
-            currentClass = key.className;
+		if( keyboard.keyPressed ) {
+			return;
+		}
 
-        key.classList.add('active');
+		if( index === -1 || e.altKey || e.altGraphKey || e.ctrlKey || e.metaKey || e.shiftKey ) {
+			// no further processing
+			return;
+		}
 
-        var evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent('noteon', false, false, { index: index });
-        keyboard.dispatchEvent(evt);
+		dispatchNoteOn( keyboard, index );
 
-    }
+	}
 
 
-    function dispatchNoteOff( keyboard ) {
-        console.log('up', keyboard);
+	function onKeyUp( keyboard, e ) {
 
-        var activeKey = keyboard.querySelector( '.active' );
+		// Only fire key up if the key is in the defined layout
+		if( findKeyIndex( keyboard, e ) !== -1 ) {
+			dispatchNoteOff( keyboard );
+		}
 
-        if( activeKey ) {
-            activeKey.classList.remove('active');
-        }
+	}
 
-        keyboard.keyPressed = false;
 
-        var evt = document.createEvent('CustomEvent');
-        evt.initCustomEvent('noteoff', false, false, null);
-        keyboard.dispatchEvent(evt);
-        
-    }
+	function findKeyIndex( keyboard, e ) {
+
+		var keyCode = e.keyCode || e.which,
+			keyChar = String.fromCharCode( keyCode ),
+			index = keyboard.keyboardLayout.indexOf( keyChar );
+
+		return index;
+
+	}
+
+
+	function dispatchNoteOn( keyboard, index ) {
+
+		keyboard.keyPressed = true;
+
+		var key = keyboard.keys[index],
+			currentClass = key.className;
+
+		key.classList.add('active');
+
+		var evt = document.createEvent('CustomEvent');
+		evt.initCustomEvent('noteon', false, false, { index: index });
+		keyboard.dispatchEvent(evt);
+
+	}
+
+
+	function dispatchNoteOff( keyboard ) {
+
+		var activeKey = keyboard.querySelector( '.active' );
+
+		if( activeKey ) {
+			activeKey.classList.remove('active');
+		}
+
+		keyboard.keyPressed = false;
+
+		var evt = document.createEvent('CustomEvent');
+		evt.initCustomEvent('noteoff', false, false, null);
+		keyboard.dispatchEvent(evt);
+
+	}
 
 
 
 
-    xtag.register('audio-keyboard', {
-        lifecycle: {
-            created: function() {
-                // TODO read attributes
-                this.numOctaves = 1;
-                this.keyClass = 'key';
-                this.keyBlackClass = 'key black';
-                this.keyboardLayout = 'ZSXDCVGBHNJMQ2W3ER5T6Y7U'.split('');
-                this.blacks = [ false, true, false, true, false, false, true, false, true, false, true, false ];
-                
-                this.keys = [];
+	xtag.register('audio-keyboard', {
+		lifecycle: {
+			created: function() {
+				this.octaves = this.getAttribute('octaves');
 
-                initLayout(this);
+				this.keyClass = 'key';
+				this.keyBlackClass = 'key black';
+				this.keyboardLayout = 'ZSXDCVGBHNJMQ2W3ER5T6Y7U'.split('');
+				this.blacks = [ false, true, false, true, false, false, true, false, true, false, true, false ];
 
-            },
-        }
-    });
+				this.keys = [];
+
+				initLayout(this);
+			}
+		},
+		accessors: {
+			'octaves': {
+				attribute: { name: 'octaves' },
+				set: function(value) {
+					this.xtag.octaves = value | 0;
+				},
+				get: function() {
+					return this.xtag.octaves;
+				}
+			}
+		}
+	});
 
 })();
