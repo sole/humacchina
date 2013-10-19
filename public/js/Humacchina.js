@@ -39,7 +39,9 @@ function Humacchina(audioContext, params) {
 	};
 
 	this.stop = function() {
-		// TODO
+		oscillators.forEach(function(osc) {
+			osc.noteOff();
+		});
 	};
 
 }

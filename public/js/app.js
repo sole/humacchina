@@ -49,6 +49,10 @@ function init() {
 	humacchina.output.connect(audioContext.destination);
 	humacchina.play();
 
+	setTimeout(function() {
+		humacchina.stop();
+	}, 1000);
+
 }
 
 module.exports = {
