@@ -2,6 +2,7 @@ function Humacchina(audioContext, params) {
 	'use strict';
 
 	var OscillatorVoice = require('supergear').OscillatorVoice;
+	var Bajotron = require('supergear').Bajotron;
 
 	var numColumns = params.columns || 8;
 	var numRows = params.rows || 8;
@@ -22,10 +23,14 @@ function Humacchina(audioContext, params) {
 
 		// TODO create oscillators, set octave
 		for(var i = 0; i < numColumns; i++) {
-			var osc = new OscillatorVoice(audioContext);
-			osc.octave = i;
-			osc.output.connect(gainNode);
-			oscillators.push(osc);
+			var voice = new Bajotron(audioContext, {
+				octaves: [ i ],
+				numVoices: 1,
+				waveType: [ OscillatorVoice.WAVE_TYPE_SAWTOOTH ]
+			});
+			voice.adsr.release = 1;
+			voice.output.connect(gainNode);
+			oscillators.push(voice);
 		}
 
 	}
@@ -36,7 +41,7 @@ function Humacchina(audioContext, params) {
 	
 	this.play = function() {
 		// TODO
-		oscillators[5].noteOn(48, 0.5, audioContext.currentTime);
+		oscillators[2].noteOn(48, 0.5, audioContext.currentTime);
 	};
 
 	this.stop = function() {
