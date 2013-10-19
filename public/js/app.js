@@ -1,4 +1,4 @@
-window.addEventListener('DOMComponentsLoaded', function() {
+function init() {
 	
 	if(!AudioDetector.detects(['webAudioSupport', 'oggSupport'])) {
 		return;
@@ -29,6 +29,7 @@ window.addEventListener('DOMComponentsLoaded', function() {
 
 
 	var audioContext = new AudioContext();
+	var Humacchina = require('./Humacchina');
 
 	var humacchina = new Humacchina(audioContext, {
 		rows: humacchinaGUI.rows,
@@ -44,7 +45,13 @@ window.addEventListener('DOMComponentsLoaded', function() {
 		]
 	});
 
+	humacchina.output.gain.value = 0.25;
 	humacchina.output.connect(audioContext.destination);
+	humacchina.play();
 
-}, false);
+}
+
+module.exports = {
+	init: init
+};
 
