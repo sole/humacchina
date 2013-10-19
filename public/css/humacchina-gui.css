@@ -8,3 +8,7 @@ humacchina-gui td {
 	min-width: 1rem;
 	min-height: 1rem;
 }
+
+humacchina-gui td.active {
+	background: #ff0;
+}

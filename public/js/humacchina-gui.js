@@ -23,6 +23,7 @@
 
 	}
 
+
 	function makeIntegerAccessor(property) {
 		return {
 			attribute: { name: property },
@@ -34,6 +35,14 @@
 			}
 		};
 	}
+
+
+	function deactivate(arr) {
+		for(var i = 0; i < arr.length; i++) {
+			arr[i].classList.remove('active');
+		}
+	}
+
 
 	xtag.register('humacchina-gui', {
 		lifecycle: {
@@ -61,7 +70,15 @@
 				}
 			},
 			setActiveColumn: function(index) {
-				// TODO
+				var activeCells = this.querySelectorAll('td.active');
+				if(activeCells.length) {
+					deactivate(activeCells);
+				}
+
+				for(var i = 0; i < this.rows; i++) {
+					var cell = this.cells[i][index];
+					cell.classList.add('active');
+				}
 			},
 			setActiveRow: function(index) {
 				// TODO

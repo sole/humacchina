@@ -12,5 +12,10 @@ window.addEventListener('DOMComponentsLoaded', function() {
 	humacchinaGUI.setCell(0, 0, 'A#3');
 	humacchinaGUI.setCell(1, 1, 'C#45');
 
+	var colIndex = 0;
+	setInterval(function() {
+		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
+	}, 1000);
+
 }, false);
 
