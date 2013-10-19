@@ -3,6 +3,10 @@ humacchina-gui {
 	font-size: 200%;
 }
 
+humacchina-gui tr.active {
+	background: rgba(0, 255, 255, 0.3);
+}
+
 humacchina-gui td {
 	border: 1px dotted #ccc;
 	min-width: 1rem;
@@ -10,5 +14,9 @@ humacchina-gui td {
 }
 
 humacchina-gui td.active {
-	background: #ff0;
+	background: rgba(255, 255, 0, 0.3);
+}
+
+humacchina-gui td.empty {
+	opacity: 0.5;
 }

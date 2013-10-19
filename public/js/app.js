@@ -17,5 +17,11 @@ window.addEventListener('DOMComponentsLoaded', function() {
 		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
 	}, 1000);
 
+	var rowIndex = 1;
+	setInterval(function() {
+		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
+	}, 1500);
+
+
 }, false);
 

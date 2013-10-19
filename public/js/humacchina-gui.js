@@ -14,9 +14,11 @@
 			for(var j = 0; j < el.columns; j++) {
 				var td = tr.insertCell(-1);
 				row.push(td);
+				td.classList.add('empty');
 				td.innerHTML = EMPTY;
 			}
 			el.cells.push(row);
+			el.trs.push(tr);
 		}
 
 		el.appendChild(table);
@@ -38,6 +40,10 @@
 
 
 	function deactivate(arr) {
+		if(arr === null || arr.length === 0) {
+			return;
+		}
+
 		for(var i = 0; i < arr.length; i++) {
 			arr[i].classList.remove('active');
 		}
@@ -51,6 +57,7 @@
 				this.columns = this.getAttribute('columns');
 
 				this.cells = [];
+				this.trs = [];
 
 				initLayout(this);
 			}
@@ -65,15 +72,14 @@
 
 				if(value === null || value === undefined) {
 					td.innerHTML = EMPTY;
+					td.classList.add('empty');
 				} else {
 					td.innerHTML = value.substr(0, 3);
+					td.classList.remove('empty');
 				}
 			},
 			setActiveColumn: function(index) {
-				var activeCells = this.querySelectorAll('td.active');
-				if(activeCells.length) {
-					deactivate(activeCells);
-				}
+				deactivate(this.querySelectorAll('td.active'));
 
 				for(var i = 0; i < this.rows; i++) {
 					var cell = this.cells[i][index];
@@ -81,7 +87,9 @@
 				}
 			},
 			setActiveRow: function(index) {
-				// TODO
+				deactivate(this.querySelectorAll('tr.active'));
+
+				this.trs[index].classList.add('active');
 			}
 		}
 	});
