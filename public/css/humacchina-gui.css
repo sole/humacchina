@@ -1,0 +1,10 @@
+humacchina-gui {
+	font-family: 'Courier New', monospace;
+	font-size: 200%;
+}
+
+humacchina-gui td {
+	border: 1px dotted #ccc;
+	min-width: 1rem;
+	min-height: 1rem;
+}
