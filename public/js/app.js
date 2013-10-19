@@ -1,4 +1,9 @@
 window.addEventListener('DOMComponentsLoaded', function() {
+	
+	if(!AudioDetector.detects(['webAudioSupport', 'oggSupport'])) {
+		return;
+	}
+
 	console.log('booom');
 	// TODO keyboard press -> player note on
 	// TODO player!
@@ -22,6 +27,24 @@ window.addEventListener('DOMComponentsLoaded', function() {
 		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
 	}, 1500);
 
+
+	var audioContext = new AudioContext();
+
+	var humacchina = new Humacchina(audioContext, {
+		rows: humacchinaGUI.rows,
+		columns: humacchinaGUI.columns,
+		scales: [
+			{ name: 'Major pentatonic', scale: [ 'C', 'D', 'E', 'G', 'A' ] },
+			{ name: 'Major pentatonic 2', scale: [ 'Gb', 'Ab', 'Bb', 'Db', 'Eb' ] },
+			{ name: 'Minor pentatonic', scale: [ 'C', 'Eb', 'F', 'G', 'Bb' ] },
+			{ name: 'Minor pentatonic Egyptian suspended', scale: [ 'Ab', 'Bb', 'Db', 'Eb', 'Gb', 'Ab' ] },
+			{ name: 'Heptonia secunda', scale: [ 'A', 'B', 'C', 'D', 'E', 'F#', 'G#'] },
+			{ name: 'C Arabic', scale: [ 'C', 'Db', 'E', 'F', 'G', 'Ab', 'B'] },
+			{ name: 'Harmonic minor', scale: [ 'A', 'B', 'C', 'D', 'E', 'F', 'G#'] }
+		]
+	});
+
+	humacchina.output.connect(audioContext.destination);
 
 }, false);
 
