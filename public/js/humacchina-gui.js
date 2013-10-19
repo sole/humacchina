@@ -2,6 +2,8 @@
 
 	'use strict';
 
+	var EMPTY = '...';
+
 	function initLayout(el) {
 
 		var table = document.createElement('table');
@@ -12,7 +14,7 @@
 			for(var j = 0; j < el.columns; j++) {
 				var td = tr.insertCell(-1);
 				row.push(td);
-				td.innerHTML = '...';
+				td.innerHTML = EMPTY;
 			}
 			el.cells.push(row);
 		}
@@ -50,7 +52,13 @@
 		},
 		methods: {
 			setCell: function(row, col, value) {
-				// TODO
+				var td = this.cells[row][col];
+
+				if(value === null || value === undefined) {
+					td.innerHTML = EMPTY;
+				} else {
+					td.innerHTML = value.substr(0, 3);
+				}
 			},
 			setActiveColumn: function(index) {
 				// TODO
