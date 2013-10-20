@@ -47,7 +47,14 @@ function init() {
 
 	humacchina.output.gain.value = 0.25;
 	humacchina.output.connect(audioContext.destination);
+
+	for(var k = 0; k < 8; k++) {
+		humacchina.toggleCell(k, k, k);
+	}
+
 	humacchina.play();
+
+	// TODO humacchinaGUI.attachTo(humacchina);
 
 	setTimeout(function() {
 		humacchina.stop();

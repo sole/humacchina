@@ -8,6 +8,8 @@ function Humacchina(audioContext, params) {
 	var numRows = params.rows || 8;
 	var scales = params.scales;
 	var oscillators = [];
+	var cells = [];
+	var currentScale = scales.length ? scales[0] : null;
 
 	var gainNode;
 
@@ -17,12 +19,23 @@ function Humacchina(audioContext, params) {
 	
 	function init() {
 
+		var i, j;
+
 		gainNode = audioContext.createGain();
 
 		// TODO create cells
+		for(i = 0; i < numRows; i++) {
+			var row = [];
+			for(j = 0; j < numColumns; j++) {
+				var cell = { value: null, transposed: null }; // value: 0..8, transposed: transposed value, using the current scale
+				row.push(cell);
+			}
+			cells.push(row);
+		}
+
 
 		// TODO create oscillators, set octave
-		for(var i = 0; i < numColumns; i++) {
+		for(i = 0; i < numColumns; i++) {
 			var voice = new Bajotron(audioContext, {
 				octaves: [ i ],
 				numVoices: 1,
@@ -32,6 +45,44 @@ function Humacchina(audioContext, params) {
 			voice.output.connect(gainNode);
 			oscillators.push(voice);
 		}
+
+	}
+
+
+	var noteNameMap = {
+		'C': 0,
+		'C#': 1,
+		'Db': 1,
+		'D': 2,
+		'D#': 3,
+		'Eb': 3,
+		'E': 4,
+		'F': 5,
+		'F#': 6,
+		'Gb': 6,
+		'G': 7,
+		'G#': 8,
+		'Ab': 8,
+		'A': 9,
+		'A#': 10,
+		'Bb': 10,
+		'B': 11
+	};
+
+	function noteNameToSemitone(name) {
+		return noteNameMap[name];
+	}
+
+	// TODO this is a serious candidate for a module
+	function getTransposed(numTones, scale) {
+
+		// If we don't have enough notes in the scale to satisfy numTones
+		// we'll just add octaves and play it higher
+		var scaleNumNotes = scale.length;
+		var octaveLoops = Math.floor(numTones / scaleNumNotes);
+		var adjustedNumTones = numTones % scaleNumNotes;
+
+		return octaveLoops * 12 + noteNameToSemitone(scale[adjustedNumTones]);
 
 	}
 
@@ -48,6 +99,24 @@ function Humacchina(audioContext, params) {
 		oscillators.forEach(function(osc) {
 			osc.noteOff();
 		});
+	};
+
+	this.toggleCell = function(value, row, column) {
+		
+		var cell = cells[row][column];
+		var isOn = cell.value !== null;
+
+		if(isOn) {
+			// if on, set to off
+			cell.value = null;
+			cell.transposed = null;
+		} else {
+			// if off, calculate transposed value
+			cell.value = value | 0;
+			cell.transposed = getTransposed(cell.value, currentScale.scale);
+		}
+
+		// TODO dispatch cell change event
 	};
 
 }
