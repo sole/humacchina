@@ -93,6 +93,14 @@ function Humacchina(audioContext, params) {
 
 	}
 
+	function getColumnData(column) {
+		var out = [];
+		for(var i = 0; i < numRows; i++) {
+			out.push(cells[i][column]);
+		}
+		return out;
+	}
+
 	//
 	
 	this.output = gainNode;
@@ -114,17 +122,25 @@ function Humacchina(audioContext, params) {
 		var cell = cells[row][activeColumn];
 		var isOn = cell.value !== null;
 
-
 		if(isOn) {
 			// if on, set to off
 			cell.value = null;
 			cell.transposed = null;
 			cell.noteName = '...';
 		} else {
-			// if off, calculate transposed value
+			// if off, invalidate existing notes in this column
+			var colData = getColumnData(activeColumn);
+			colData.forEach(function(cell, index) {
+				cell.value = null;
+				cell.transposed = null;
+				cell.noteName = '...';
+			});
+			
+			// and calculate transposed value
 			cell.value = row | 0;
 			cell.transposed = baseNote + 12 * activeColumn + getTransposed(cell.value, currentScale.scale);
 			cell.noteName = MIDIUtils.noteNumberToName(cell.transposed);
+
 		}
 
 		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: column, transposed: cell.transposed });
@@ -141,11 +157,12 @@ function Humacchina(audioContext, params) {
 	};
 
 	this.getActiveColumnData = function() {
-		var out = [];
+		/*var out = [];
 		for(var i = 0; i < numRows; i++) {
 			out.push(cells[i][activeColumn]);
 		}
-		return out;
+		return out;*/
+		return getColumnData(activeColumn);
 	};
 
 	// TODO: use prev/next scale
