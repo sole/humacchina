@@ -9,29 +9,7 @@ function init() {
 		return;
 	}
 
-	console.log('booom');
-	// TODO keyboard press -> player note on
-	// TODO player!
-	var keyboard = document.querySelector('audio-keyboard');
-
-	keyboard.addEventListener('noteon', function(e) {
-		console.log('keyboard, note on', e);
-	}, false);
-
 	var humacchinaGUI = document.querySelector('humacchina-gui');
-	humacchinaGUI.setCell(0, 0, 'A#3');
-	humacchinaGUI.setCell(1, 1, 'C#45');
-
-	var colIndex = 0;
-	setInterval(function() {
-		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
-	}, 1000);
-
-	var rowIndex = 1;
-	setInterval(function() {
-		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
-	}, 1500);
-
 
 	var audioContext = new AudioContext();
 	var Humacchina = require('./Humacchina');
@@ -55,7 +33,30 @@ function init() {
 
 	humacchinaGUI.attachTo(humacchina);
 
+	// TODO keyboard press -> player note on
+	// TODO player!
 	
+	// TMP // ------------------------------------------------------------
+	
+	var keyboard = document.querySelector('audio-keyboard');
+
+	keyboard.addEventListener('noteon', function(e) {
+		console.log('keyboard, note on', e);
+	}, false);
+
+	humacchinaGUI.setCell(0, 0, 'A#3');
+	humacchinaGUI.setCell(1, 1, 'C#45');
+
+	var colIndex = 0;
+	setInterval(function() {
+		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
+	}, 1000);
+
+	var rowIndex = 1;
+	setInterval(function() {
+		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
+	}, 1500);
+
 	for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k, k);
 	}
@@ -66,6 +67,8 @@ function init() {
 	setTimeout(function() {
 		humacchina.stop();
 	}, 1000);
+
+	// ---------------------------------------------------------------------
 
 }
 
