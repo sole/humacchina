@@ -1,3 +1,12 @@
 body {
 	font-size: 1rem;
 }
+
+#quneo {
+	display: inline-block;
+	border: 1px solid red;
+}
+
+humacchina-gui {
+	display: inline-block;
+}

@@ -13,6 +13,7 @@ function Humacchina(audioContext, params) {
 	var oscillators = [];
 	var cells = [];
 	var currentScale = scales.length ? scales[0] : null;
+	var activeColumn = 0;
 
 	var gainNode;
 
@@ -107,10 +108,12 @@ function Humacchina(audioContext, params) {
 		});
 	};
 
-	this.toggleCell = function(value, row, column) {
+	
+	this.toggleCell = function(row, column) {
 		
-		var cell = cells[row][column];
+		var cell = cells[row][activeColumn];
 		var isOn = cell.value !== null;
+
 
 		if(isOn) {
 			// if on, set to off
@@ -118,15 +121,23 @@ function Humacchina(audioContext, params) {
 			cell.transposed = null;
 		} else {
 			// if off, calculate transposed value
-			cell.value = value | 0;
-			cell.transposed = baseNote + 12 * column + getTransposed(cell.value, currentScale.scale);
+			cell.value = row | 0;
+			cell.transposed = baseNote + 12 * activeColumn + getTransposed(cell.value, currentScale.scale);
 		}
 
 		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: column, transposed: cell.transposed });
 
 	};
 
+	this.setActiveColumn = function(value) {
+		activeColumn = value;
+		that.dispatchEvent({ type: that.EVENT_ACTIVE_COLUMN_CHANGED, activeColumn: value });
+	};
+
+	// TODO: use prev/next scale
+
 	this.EVENT_CELL_CHANGED = 'cell_changed';
+	this.EVENT_ACTIVE_COLUMN_CHANGED = 'active_column_changed';
 
 }
 

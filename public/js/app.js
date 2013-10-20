@@ -33,11 +33,47 @@ function init() {
 
 	humacchinaGUI.attachTo(humacchina);
 
+	// Simulates the QuNeo interface
+	var matrix = document.getElementById('matrix');
+	for(var i = 0; i < humacchinaGUI.rows; i++) {
+		var tr = matrix.insertRow(-1);
+		for(var j = 0; j < humacchinaGUI.columns; j++) {
+			var cell = tr.insertCell(-1);
+			var input = document.createElement('input');
+			input.type = 'checkbox';
+			cell.appendChild(input);
+			input.addEventListener('click', getMatrixListener(i, j), false);
+		}
+	}
+
+	humacchina.addEventListener(humacchina.EVENT_ACTIVE_COLUMN_CHANGED, function(ev) {
+		// TODO update matrix with values for this column
+	});
+
+	var activeColumnInput = document.getElementById('activeColumn');
+	activeColumnInput.addEventListener('change', function(ev) {
+		humacchina.setActiveColumn(activeColumnInput.value);
+	}, false);
+	humacchina.setActiveColumn(activeColumnInput.value);
+
+
+	// Generates a listener for a particular 'button' or 'quneo pad corner'
+	function getMatrixListener(row, column) {
+		return function() {
+			console.log('pressed', row, column);
+			toggleNote(row, column);
+		};
+	}
+
+	function toggleNote(row, column) {
+		humacchina.toggleCell(row, column);
+	}
+
 	// TODO keyboard press -> player note on
 	// TODO player!
 	
 	// TMP // ------------------------------------------------------------
-	
+
 	var keyboard = document.querySelector('audio-keyboard');
 
 	keyboard.addEventListener('noteon', function(e) {
@@ -47,10 +83,10 @@ function init() {
 	humacchinaGUI.setCell(0, 0, 'A#3');
 	humacchinaGUI.setCell(1, 1, 'C#45');
 
-	var colIndex = 0;
+	/*var colIndex = 0;
 	setInterval(function() {
 		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
-	}, 1000);
+	}, 1000);*/
 
 	var rowIndex = 1;
 	setInterval(function() {
@@ -58,7 +94,7 @@ function init() {
 	}, 1500);
 
 	for(var k = 0; k < 8; k++) {
-		humacchina.toggleCell(k, k, k);
+		humacchina.toggleCell(k, k);
 	}
 
 	humacchina.play();
