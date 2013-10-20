@@ -1,5 +1,7 @@
 {
   "dependencies": {
-    "supergear": "0.0.2"
+    "supergear": "0.0.2",
+    "eventdispatcher.js": "0.0.2",
+    "midiutils": "0.0.2"
   }
 }

@@ -90,6 +90,12 @@
 				deactivate(this.querySelectorAll('tr.active'));
 
 				this.trs[index].classList.add('active');
+			},
+			attachTo: function(humacchina) {
+				var that = this;
+				humacchina.addEventListener(humacchina.EVENT_CELL_CHANGED, function(ev) {
+					that.setCell(ev.row, ev.column, MIDIUtils.noteNumberToName(ev.transposed));
+				});
 			}
 		}
 	});

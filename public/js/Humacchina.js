@@ -1,12 +1,15 @@
 function Humacchina(audioContext, params) {
 	'use strict';
 
+	var that = this;
+	var EventDispatcher = require('eventdispatcher.js');
 	var OscillatorVoice = require('supergear').OscillatorVoice;
 	var Bajotron = require('supergear').Bajotron;
 
 	var numColumns = params.columns || 8;
 	var numRows = params.rows || 8;
 	var scales = params.scales;
+	var baseNote = params.baseNote || 4;
 	var oscillators = [];
 	var cells = [];
 	var currentScale = scales.length ? scales[0] : null;
@@ -20,6 +23,8 @@ function Humacchina(audioContext, params) {
 	function init() {
 
 		var i, j;
+
+		EventDispatcher.call(that);
 
 		gainNode = audioContext.createGain();
 
@@ -37,7 +42,8 @@ function Humacchina(audioContext, params) {
 		// TODO create oscillators, set octave
 		for(i = 0; i < numColumns; i++) {
 			var voice = new Bajotron(audioContext, {
-				octaves: [ i ],
+				//octaves: [ i ],
+				octaves: [ 1 ],
 				numVoices: 1,
 				waveType: [ OscillatorVoice.WAVE_TYPE_SAWTOOTH ]
 			});
@@ -113,11 +119,14 @@ function Humacchina(audioContext, params) {
 		} else {
 			// if off, calculate transposed value
 			cell.value = value | 0;
-			cell.transposed = getTransposed(cell.value, currentScale.scale);
+			cell.transposed = baseNote + 12 * column + getTransposed(cell.value, currentScale.scale);
 		}
 
-		// TODO dispatch cell change event
+		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: column, transposed: cell.transposed });
+
 	};
+
+	this.EVENT_CELL_CHANGED = 'cell_changed';
 
 }
 
