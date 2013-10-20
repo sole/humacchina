@@ -35,19 +35,30 @@ function init() {
 
 	// Simulates the QuNeo interface
 	var matrix = document.getElementById('matrix');
+	var matrixInputs = [];
+
 	for(var i = 0; i < humacchinaGUI.rows; i++) {
 		var tr = matrix.insertRow(-1);
+		var matrixRow = [];
+
 		for(var j = 0; j < humacchinaGUI.columns; j++) {
 			var cell = tr.insertCell(-1);
 			var input = document.createElement('input');
 			input.type = 'checkbox';
 			cell.appendChild(input);
+			matrixRow.push(input);
 			input.addEventListener('click', getMatrixListener(i, j), false);
 		}
+		
+		matrixInputs.push(matrixRow);
 	}
 
+	humacchina.addEventListener(humacchina.EVENT_CELL_CHANGED, function(ev) {
+		redrawMatrix();
+	});
+
 	humacchina.addEventListener(humacchina.EVENT_ACTIVE_COLUMN_CHANGED, function(ev) {
-		// TODO update matrix with values for this column
+		redrawMatrix();
 	});
 
 	var activeColumnInput = document.getElementById('activeColumn');
@@ -65,6 +76,26 @@ function init() {
 		};
 	}
 
+	function redrawMatrix() {
+		console.log('redraw matrix');
+
+		var inputs = matrix.querySelectorAll('input');
+		for(var i = 0; i < inputs.length; i++) {
+			inputs[i].checked = false;
+		}
+
+		var activeColumn = humacchina.getActiveColumn();
+		var data = humacchina.getActiveColumnData();
+		console.log('activeColumn', activeColumn);
+		data.forEach(function(cell, row) {
+			console.log('row', row, 'col', activeColumn, 'v=', cell.value, 'notena', cell.noteName);
+			if(cell.value !== null) {
+
+				matrixInputs[row][cell.value].checked = true;
+			}
+		});
+	}
+
 	function toggleNote(row, column) {
 		humacchina.toggleCell(row, column);
 	}
@@ -80,22 +111,19 @@ function init() {
 		console.log('keyboard, note on', e);
 	}, false);
 
-	humacchinaGUI.setCell(0, 0, 'A#3');
-	humacchinaGUI.setCell(1, 1, 'C#45');
-
 	/*var colIndex = 0;
 	setInterval(function() {
 		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
 	}, 1000);*/
 
-	var rowIndex = 1;
+	/*var rowIndex = 1;
 	setInterval(function() {
 		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
-	}, 1500);
+	}, 1500);*/
 
-	for(var k = 0; k < 8; k++) {
+	/*for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k);
-	}
+	}*/
 
 	humacchina.play();
 

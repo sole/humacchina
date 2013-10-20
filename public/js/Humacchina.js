@@ -33,7 +33,7 @@ function Humacchina(audioContext, params) {
 		for(i = 0; i < numRows; i++) {
 			var row = [];
 			for(j = 0; j < numColumns; j++) {
-				var cell = { value: null, transposed: null }; // value: 0..8, transposed: transposed value, using the current scale
+				var cell = { value: null, transposed: null, noteName: '...' }; // value: 0..8, transposed: transposed value, using the current scale
 				row.push(cell);
 			}
 			cells.push(row);
@@ -119,19 +119,33 @@ function Humacchina(audioContext, params) {
 			// if on, set to off
 			cell.value = null;
 			cell.transposed = null;
+			cell.noteName = '...';
 		} else {
 			// if off, calculate transposed value
 			cell.value = row | 0;
 			cell.transposed = baseNote + 12 * activeColumn + getTransposed(cell.value, currentScale.scale);
+			cell.noteName = MIDIUtils.noteNumberToName(cell.transposed);
 		}
 
 		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: column, transposed: cell.transposed });
 
 	};
 
+	this.getActiveColumn = function() {
+		return activeColumn;
+	};
+
 	this.setActiveColumn = function(value) {
 		activeColumn = value;
 		that.dispatchEvent({ type: that.EVENT_ACTIVE_COLUMN_CHANGED, activeColumn: value });
+	};
+
+	this.getActiveColumnData = function() {
+		var out = [];
+		for(var i = 0; i < numRows; i++) {
+			out.push(cells[i][activeColumn]);
+		}
+		return out;
 	};
 
 	// TODO: use prev/next scale
