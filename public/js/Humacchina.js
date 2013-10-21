@@ -141,11 +141,10 @@ function Humacchina(audioContext, params) {
 	
 	this.toggleCell = function(row, step) {
 	
-		//var cell = cells[row][activeVoiceIndex];
 		var cell = cells[step][activeVoiceIndex];
 		var newValue = row | 0;
-		//var newNote = baseNote + 12 * activeVoiceIndex + getTransposed(newValue, currentScale.scale);
 		var newNote = getScaledNote(newValue, activeVoiceIndex, currentScale.scale);
+		
 		// if we press the same key it means we want to turn it off
 		var toToggle = newNote === cell.transposed;
 

@@ -102,7 +102,6 @@
 				});
 
 				humacchina.addEventListener(humacchina.EVENT_SCALE_CHANGED, function(ev) {
-					console.log('redraw!');
 					for(var i = 0; i < that.rows; i++) {
 						for(var j = 0; j < that.columns; j++) {
 							that.setCell(i, j, humacchina.getCell(i, j).noteName);
