@@ -34,7 +34,7 @@ function Humacchina(audioContext, params) {
 		for(i = 0; i < numRows; i++) {
 			var row = [];
 			for(j = 0; j < numColumns; j++) {
-				var cell = { value: null, transposed: null, noteName: '...' }; // value: 0..8, transposed: transposed value, using the current scale
+				var cell = { value: null, transposed: null, noteName: '...', row: i, column: j }; // value: 0..8, transposed: transposed value, using the current scale
 				row.push(cell);
 			}
 			cells.push(row);
@@ -126,33 +126,29 @@ function Humacchina(audioContext, params) {
 	};
 
 	
-	this.toggleCell = function(row, column) {
+	this.toggleCell = function(row, step) {
 	
-		var cell = cells[row][activeVoiceIndex];
-		var isOn = cell.value !== null;
+		//var cell = cells[row][activeVoiceIndex];
+		var cell = cells[step][activeVoiceIndex];
+		var newValue = row | 0;
+		var newNote = baseNote + 12 * activeVoiceIndex + getTransposed(newValue, currentScale.scale);
+		// if we press the same key it means we want to turn it off
+		var toToggle = newNote === cell.transposed; //cell.value !== null;
 
-		if(isOn) {
-			// if on, set to off
+		if(toToggle) {
+			// set it off
 			cell.value = null;
 			cell.transposed = null;
 			cell.noteName = '...';
 		} else {
-			// if off, invalidate existing notes in this column
-			var colData = getColumnData(activeVoiceIndex);
-			colData.forEach(function(columnCell, index) {
-				columnCell.value = null;
-				columnCell.transposed = null;
-				columnCell.noteName = '...';
-			});
-			
-			// and calculate transposed value
-			cell.value = row | 0;
-			cell.transposed = baseNote + 12 * activeVoiceIndex + getTransposed(cell.value, currentScale.scale);
-			cell.noteName = MIDIUtils.noteNumberToName(cell.transposed);
+			// calculate transposed value
+			cell.value = newValue;
+			cell.transposed = newNote;
+			cell.noteName = MIDIUtils.noteNumberToName(newNote);
 
 		}
 
-		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: activeVoiceIndex, transposed: cell.transposed, noteName: cell.noteName });
+		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: step, column: activeVoiceIndex, transposed: cell.transposed, noteName: cell.noteName });
 
 	};
 
@@ -161,7 +157,7 @@ function Humacchina(audioContext, params) {
 	};
 
 	this.setActiveVoice = function(value) {
-		activeVoiceIndex = value;
+		activeVoiceIndex = parseInt(value, 10);
 		that.dispatchEvent({ type: that.EVENT_ACTIVE_VOICE_CHANGED, activeVoiceIndex: value });
 	};
 

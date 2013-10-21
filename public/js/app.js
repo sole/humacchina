@@ -114,13 +114,13 @@ function init() {
 			console.log('row', row, 'col', activeVoice, 'v=', cell.value, 'notena', cell.noteName);
 			if(cell.value !== null) {
 
-				matrixInputs[row][cell.value].checked = true;
+				matrixInputs[cell.value][row].checked = true;
 			}
 		});
 	}
 
-	function toggleNote(row, column) {
-		humacchina.toggleCell(row, column);
+	function toggleNote(row, step) {
+		humacchina.toggleCell(row, step);
 	}
 
 	// TODO keyboard press -> player note on
