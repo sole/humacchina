@@ -82,6 +82,7 @@ function init() {
 	activeScaleInput.addEventListener('change', function(ev) {
 		humacchina.setActiveScale(activeScaleInput.value);
 	}, false);
+	humacchina.setActiveScale(activeScaleInput.value);
 
 
 	// Generates a listener for a particular 'button' or 'quneo pad corner'
