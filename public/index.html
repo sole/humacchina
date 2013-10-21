@@ -13,18 +13,13 @@
 				STEP SEQUENCER
 				<table id="matrix">
 				</table>
-				<input type="number" id="activeColumn" min="0" max=7" step="1" value="0">
+				<label>voice <input type="number" id="activeColumn" min="0" max=7" step="1" value="0"></label>
 			</div>
 			<humacchina-gui rows="8" columns="8"></humacchina-gui>
-		</div>
-		<div id="controls">
-			<!-- TODO: Initially hidden? -->
-			<audio-keyboard octaves="2"></audio-keyboard>
 		</div>
 		<script type="text/javascript" src="js/libs/AudioDetector.js"></script>
 		<script type="text/javascript" src="js/libs/AudioContextMonkeyPatch.js"></script>
 		<script type="text/javascript" src="js/libs/x-tag/core.js"></script>
-		<script type="text/javascript" src="js/libs/audio-tags/audio-keyboard.js"></script>
 		<script type="text/javascript" src="js/humacchina-gui.js"></script>
 		<script type="text/javascript" src="bundle.js"></script>
 	</body>

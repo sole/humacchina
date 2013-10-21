@@ -12,7 +12,7 @@ function Humacchina(audioContext, params) {
 	var baseNote = params.baseNote || 4;
 	var oscillators = [];
 	var cells = [];
-	var currentScale = scales.length ? scales[0] : null;
+	var currentScale = null;
 	var activeColumn = 0;
 
 	var gainNode;
@@ -52,6 +52,8 @@ function Humacchina(audioContext, params) {
 			voice.output.connect(gainNode);
 			oscillators.push(voice);
 		}
+
+		setScale(scales.length ? scales[0] : null);
 
 	}
 
@@ -99,6 +101,11 @@ function Humacchina(audioContext, params) {
 			out.push(cells[i][column]);
 		}
 		return out;
+	}
+
+	function setScale(scale) {
+		currentScale = scale;
+		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
 	}
 
 	//
@@ -165,10 +172,20 @@ function Humacchina(audioContext, params) {
 		return getColumnData(activeColumn);
 	};
 
+	this.getCurrentScaleNotes = function() {
+		var out = [];
+		var scale = currentScale.scale;
+		for(var i = 0; i < numColumns; i++) {
+			out.push(scale[i % scale.length]);
+		}
+		return out;
+	};
+
 	// TODO: use prev/next scale
 
 	this.EVENT_CELL_CHANGED = 'cell_changed';
 	this.EVENT_ACTIVE_COLUMN_CHANGED = 'active_column_changed';
+	this.EVENT_SCALE_CHANGED = 'scale_changed';
 
 }
 

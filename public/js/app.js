@@ -44,7 +44,7 @@ function init() {
 		var matrixRow = [];
 
 		var noteCell = tr.insertCell(-1);
-		noteCell.className = 'note';
+		noteCell.className = 'scaleNote';
 		noteCell.innerHTML = '---';
 
 		for(var j = 0; j < humacchinaGUI.columns; j++) {
@@ -67,6 +67,10 @@ function init() {
 		redrawMatrix();
 	});
 
+	humacchina.addEventListener(humacchina.EVENT_SCALE_CHANGED, function(ev) {
+		redrawMatrix();
+	});
+
 	var activeColumnInput = document.getElementById('activeColumn');
 	activeColumnInput.addEventListener('change', function(ev) {
 		humacchina.setActiveColumn(activeColumnInput.value);
@@ -84,6 +88,12 @@ function init() {
 
 	function redrawMatrix() {
 		console.log('redraw matrix');
+
+		var scaleNotes = matrix.querySelectorAll('.scaleNote');
+		var currentScaleNotes = humacchina.getCurrentScaleNotes();
+		for(var k = 0; k < scaleNotes.length; k++) {
+			scaleNotes[k].innerHTML = currentScaleNotes[k];
+		}
 
 		var inputs = matrix.querySelectorAll('input');
 		for(var i = 0; i < inputs.length; i++) {
@@ -110,22 +120,6 @@ function init() {
 	// TODO player!
 	
 	// TMP // ------------------------------------------------------------
-
-	var keyboard = document.querySelector('audio-keyboard');
-
-	keyboard.addEventListener('noteon', function(e) {
-		console.log('keyboard, note on', e);
-	}, false);
-
-	/*var colIndex = 0;
-	setInterval(function() {
-		humacchinaGUI.setActiveColumn(++colIndex % humacchinaGUI.columns);
-	}, 1000);*/
-
-	/*var rowIndex = 1;
-	setInterval(function() {
-		humacchinaGUI.setActiveRow(++rowIndex % humacchinaGUI.rows);
-	}, 1500);*/
 
 	/*for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k);
