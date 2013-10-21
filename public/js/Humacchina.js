@@ -30,21 +30,19 @@ function Humacchina(audioContext, params) {
 
 		gainNode = audioContext.createGain();
 
-		// TODO create cells
 		for(i = 0; i < numRows; i++) {
 			var row = [];
 			for(j = 0; j < numColumns; j++) {
-				var cell = { value: null, transposed: null, noteName: '...', row: i, column: j }; // value: 0..8, transposed: transposed value, using the current scale
+				// value: 0..8, transposed: transposed value, using the current scale
+				var cell = { value: null, transposed: null, noteName: '...', row: i, column: j };
 				row.push(cell);
 			}
 			cells.push(row);
 		}
 
 
-		// TODO create oscillators, set octave
 		for(i = 0; i < numColumns; i++) {
 			var voice = new Bajotron(audioContext, {
-				//octaves: [ i ],
 				octaves: [ 1 ],
 				numVoices: 1,
 				waveType: [ OscillatorVoice.WAVE_TYPE_SAWTOOTH ]
@@ -55,7 +53,6 @@ function Humacchina(audioContext, params) {
 		}
 
 		setScale(scales.length ? scales[0] : null);
-
 	}
 
 
@@ -105,8 +102,21 @@ function Humacchina(audioContext, params) {
 	}
 
 	function setScale(scale) {
+		// TODO what if scale = null
+		// in the mean time you'd better not set a null scale
 		currentScale = scale;
-		// TODO update notes!
+		var actualScale = currentScale.scale;
+
+		for(var i = 0; i < numRows; i++) {
+			for(var j = 0; j < numColumns; j++) {
+				var cell = cells[i][j];
+				if(cell.value !== null) {
+					cell.transposed = getScaledNote(cell.value, j, actualScale);
+					cell.noteName = MIDIUtils.noteNumberToName(cell.transposed);
+				}
+			}
+		}
+		
 		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
 	}
 
@@ -125,15 +135,19 @@ function Humacchina(audioContext, params) {
 		});
 	};
 
+	function getScaledNote(value, voiceIndex, scale) {
+		return baseNote + 12 * voiceIndex + getTransposed(value, scale);
+	}
 	
 	this.toggleCell = function(row, step) {
 	
 		//var cell = cells[row][activeVoiceIndex];
 		var cell = cells[step][activeVoiceIndex];
 		var newValue = row | 0;
-		var newNote = baseNote + 12 * activeVoiceIndex + getTransposed(newValue, currentScale.scale);
+		//var newNote = baseNote + 12 * activeVoiceIndex + getTransposed(newValue, currentScale.scale);
+		var newNote = getScaledNote(newValue, activeVoiceIndex, currentScale.scale);
 		// if we press the same key it means we want to turn it off
-		var toToggle = newNote === cell.transposed; //cell.value !== null;
+		var toToggle = newNote === cell.transposed;
 
 		if(toToggle) {
 			// set it off
@@ -150,6 +164,10 @@ function Humacchina(audioContext, params) {
 
 		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: step, column: activeVoiceIndex, transposed: cell.transposed, noteName: cell.noteName });
 
+	};
+
+	this.getCell = function(row, column) {
+		return cells[row][column];
 	};
 
 	this.getActiveVoice = function() {
