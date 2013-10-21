@@ -1,10 +1,5 @@
 function init() {
 
-	// Guarrada
-	var MIDIUtils = require('MIDIUtils');
-	window.MIDIUtils = MIDIUtils;
-	// --------
-
 	if(!AudioDetector.detects(['webAudioSupport', 'oggSupport'])) {
 		return;
 	}
@@ -36,10 +31,21 @@ function init() {
 	// Simulates the QuNeo interface
 	var matrix = document.getElementById('matrix');
 	var matrixInputs = [];
+	var i;
 
-	for(var i = 0; i < humacchinaGUI.rows; i++) {
+	var trh = matrix.insertRow(-1);
+	trh.insertCell(-1); // empty for the 'legend'
+	for(i = 0; i < humacchinaGUI.columns; i++) {
+		trh.insertCell(-1).innerHTML = (i+1) + "";
+	}
+
+	for(i = 0; i < humacchinaGUI.rows; i++) {
 		var tr = matrix.insertRow(-1);
 		var matrixRow = [];
+
+		var noteCell = tr.insertCell(-1);
+		noteCell.className = 'note';
+		noteCell.innerHTML = '---';
 
 		for(var j = 0; j < humacchinaGUI.columns; j++) {
 			var cell = tr.insertCell(-1);
