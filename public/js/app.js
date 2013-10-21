@@ -89,13 +89,11 @@ function init() {
 	// Generates a listener for a particular 'button' or 'quneo pad corner'
 	function getMatrixListener(row, column) {
 		return function() {
-			console.log('pressed', row, column);
 			toggleNote(row, column);
 		};
 	}
 
 	function redrawMatrix() {
-		console.log('redraw matrix');
 
 		var scaleNotes = matrix.querySelectorAll('.scaleNote');
 		var currentScaleNotes = humacchina.getCurrentScaleNotes();
@@ -110,11 +108,8 @@ function init() {
 
 		var activeVoice = humacchina.getActiveVoice();
 		var data = humacchina.getActiveVoiceData();
-		console.log('activeVoice', activeVoice);
 		data.forEach(function(cell, row) {
-			console.log('row', row, 'col', activeVoice, 'v=', cell.value, 'notena', cell.noteName);
 			if(cell.value !== null) {
-
 				matrixInputs[cell.value][row].checked = true;
 			}
 		});
@@ -124,14 +119,6 @@ function init() {
 		humacchina.toggleCell(row, step);
 	}
 
-	// TODO keyboard press -> player note on
-	// TODO player!
-	
-	// TMP // ------------------------------------------------------------
-
-	/*for(var k = 0; k < 8; k++) {
-		humacchina.toggleCell(k, k);
-	}*/
 
 	humacchina.play();
 
@@ -140,7 +127,6 @@ function init() {
 		humacchina.stop();
 	}, 1000);
 
-	// ---------------------------------------------------------------------
 
 }
 

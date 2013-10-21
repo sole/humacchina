@@ -200,8 +200,7 @@ function Humacchina(audioContext, params) {
 		setScale(scales[index]);
 	};
 
-	// TODO: use prev/next scale
-
+	
 	this.EVENT_CELL_CHANGED = 'cell_changed';
 	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
 	this.EVENT_SCALE_CHANGED = 'scale_changed';
