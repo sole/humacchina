@@ -74,6 +74,7 @@ function init() {
 	var activeVoiceInput = document.getElementById('activeVoice');
 	activeVoiceInput.addEventListener('change', function(ev) {
 		humacchina.setActiveVoice(activeVoiceInput.value);
+		redrawMatrix();
 	}, false);
 	humacchina.setActiveVoice(activeVoiceInput.value);
 
