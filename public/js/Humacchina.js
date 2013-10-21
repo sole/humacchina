@@ -5,6 +5,7 @@ function Humacchina(audioContext, params) {
 	var EventDispatcher = require('eventdispatcher.js');
 	var OscillatorVoice = require('supergear').OscillatorVoice;
 	var Bajotron = require('supergear').Bajotron;
+	var MIDIUtils = require('MIDIUtils');
 
 	var numColumns = params.columns || 8;
 	var numRows = params.rows || 8;
@@ -126,7 +127,7 @@ function Humacchina(audioContext, params) {
 
 	
 	this.toggleCell = function(row, column) {
-		
+	
 		var cell = cells[row][activeVoiceIndex];
 		var isOn = cell.value !== null;
 
@@ -138,10 +139,10 @@ function Humacchina(audioContext, params) {
 		} else {
 			// if off, invalidate existing notes in this column
 			var colData = getColumnData(activeVoiceIndex);
-			colData.forEach(function(cell, index) {
-				cell.value = null;
-				cell.transposed = null;
-				cell.noteName = '...';
+			colData.forEach(function(columnCell, index) {
+				columnCell.value = null;
+				columnCell.transposed = null;
+				columnCell.noteName = '...';
 			});
 			
 			// and calculate transposed value
@@ -151,7 +152,7 @@ function Humacchina(audioContext, params) {
 
 		}
 
-		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: column, transposed: cell.transposed });
+		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: row, column: activeVoiceIndex, transposed: cell.transposed, noteName: cell.noteName });
 
 	};
 

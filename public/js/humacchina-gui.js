@@ -94,8 +94,8 @@
 			attachTo: function(humacchina) {
 				var that = this;
 				humacchina.addEventListener(humacchina.EVENT_CELL_CHANGED, function(ev) {
-					var value = ev.transposed !== null ? MIDIUtils.noteNumberToName(ev.transposed) : null;
-					that.setCell(ev.row, ev.column, value);
+					//var value = ev.transposed !== null ? MIDIUtils.noteNumberToName(ev.transposed) : null;
+					that.setCell(ev.row, ev.column, ev.noteName);
 				});
 
 				humacchina.addEventListener(humacchina.EVENT_ACTIVE_VOICE_CHANGED, function(ev) {
