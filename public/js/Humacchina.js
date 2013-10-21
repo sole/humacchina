@@ -13,7 +13,7 @@ function Humacchina(audioContext, params) {
 	var oscillators = [];
 	var cells = [];
 	var currentScale = null;
-	var activeColumn = 0;
+	var activeVoiceIndex = 0;
 
 	var gainNode;
 
@@ -105,6 +105,7 @@ function Humacchina(audioContext, params) {
 
 	function setScale(scale) {
 		currentScale = scale;
+		// TODO update notes!
 		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
 	}
 
@@ -126,7 +127,7 @@ function Humacchina(audioContext, params) {
 	
 	this.toggleCell = function(row, column) {
 		
-		var cell = cells[row][activeColumn];
+		var cell = cells[row][activeVoiceIndex];
 		var isOn = cell.value !== null;
 
 		if(isOn) {
@@ -136,7 +137,7 @@ function Humacchina(audioContext, params) {
 			cell.noteName = '...';
 		} else {
 			// if off, invalidate existing notes in this column
-			var colData = getColumnData(activeColumn);
+			var colData = getColumnData(activeVoiceIndex);
 			colData.forEach(function(cell, index) {
 				cell.value = null;
 				cell.transposed = null;
@@ -145,7 +146,7 @@ function Humacchina(audioContext, params) {
 			
 			// and calculate transposed value
 			cell.value = row | 0;
-			cell.transposed = baseNote + 12 * activeColumn + getTransposed(cell.value, currentScale.scale);
+			cell.transposed = baseNote + 12 * activeVoiceIndex + getTransposed(cell.value, currentScale.scale);
 			cell.noteName = MIDIUtils.noteNumberToName(cell.transposed);
 
 		}
@@ -154,22 +155,17 @@ function Humacchina(audioContext, params) {
 
 	};
 
-	this.getActiveColumn = function() {
-		return activeColumn;
+	this.getActiveVoice = function() {
+		return activeVoiceIndex;
 	};
 
-	this.setActiveColumn = function(value) {
-		activeColumn = value;
-		that.dispatchEvent({ type: that.EVENT_ACTIVE_COLUMN_CHANGED, activeColumn: value });
+	this.setActiveVoice = function(value) {
+		activeVoiceIndex = value;
+		that.dispatchEvent({ type: that.EVENT_ACTIVE_VOICE_CHANGED, activeVoiceIndex: value });
 	};
 
-	this.getActiveColumnData = function() {
-		/*var out = [];
-		for(var i = 0; i < numRows; i++) {
-			out.push(cells[i][activeColumn]);
-		}
-		return out;*/
-		return getColumnData(activeColumn);
+	this.getActiveVoiceData = function() {
+		return getColumnData(activeVoiceIndex);
 	};
 
 	this.getCurrentScaleNotes = function() {
@@ -192,7 +188,7 @@ function Humacchina(audioContext, params) {
 	// TODO: use prev/next scale
 
 	this.EVENT_CELL_CHANGED = 'cell_changed';
-	this.EVENT_ACTIVE_COLUMN_CHANGED = 'active_column_changed';
+	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
 	this.EVENT_SCALE_CHANGED = 'scale_changed';
 
 }

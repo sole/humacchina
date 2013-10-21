@@ -71,11 +71,11 @@ function init() {
 		redrawMatrix();
 	});
 
-	var activeColumnInput = document.getElementById('activeColumn');
-	activeColumnInput.addEventListener('change', function(ev) {
-		humacchina.setActiveColumn(activeColumnInput.value);
+	var activeVoiceInput = document.getElementById('activeVoice');
+	activeVoiceInput.addEventListener('change', function(ev) {
+		humacchina.setActiveVoice(activeVoiceInput.value);
 	}, false);
-	humacchina.setActiveColumn(activeColumnInput.value);
+	humacchina.setActiveVoice(activeVoiceInput.value);
 
 	var activeScaleInput = document.getElementById('activeScale');
 	activeScaleInput.max = humacchina.getNumScales() - 1;
@@ -106,11 +106,11 @@ function init() {
 			inputs[i].checked = false;
 		}
 
-		var activeColumn = humacchina.getActiveColumn();
-		var data = humacchina.getActiveColumnData();
-		console.log('activeColumn', activeColumn);
+		var activeVoice = humacchina.getActiveVoice();
+		var data = humacchina.getActiveVoiceData();
+		console.log('activeVoice', activeVoice);
 		data.forEach(function(cell, row) {
-			console.log('row', row, 'col', activeColumn, 'v=', cell.value, 'notena', cell.noteName);
+			console.log('row', row, 'col', activeVoice, 'v=', cell.value, 'notena', cell.noteName);
 			if(cell.value !== null) {
 
 				matrixInputs[row][cell.value].checked = true;

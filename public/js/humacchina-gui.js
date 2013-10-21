@@ -78,7 +78,7 @@
 					td.classList.remove('empty');
 				}
 			},
-			setActiveColumn: function(index) {
+			setActiveVoice: function(index) {
 				deactivate(this.querySelectorAll('td.active'));
 
 				for(var i = 0; i < this.rows; i++) {
@@ -98,8 +98,8 @@
 					that.setCell(ev.row, ev.column, value);
 				});
 
-				humacchina.addEventListener(humacchina.EVENT_ACTIVE_COLUMN_CHANGED, function(ev) {
-					that.setActiveColumn(ev.activeColumn);
+				humacchina.addEventListener(humacchina.EVENT_ACTIVE_VOICE_CHANGED, function(ev) {
+					that.setActiveVoice(ev.activeVoiceIndex);
 				});
 			}
 		}
