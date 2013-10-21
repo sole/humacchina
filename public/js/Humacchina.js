@@ -181,6 +181,14 @@ function Humacchina(audioContext, params) {
 		return out;
 	};
 
+	this.getNumScales = function() {
+		return scales.length;
+	};
+
+	this.setActiveScale = function(index) {
+		setScale(scales[index]);
+	};
+
 	// TODO: use prev/next scale
 
 	this.EVENT_CELL_CHANGED = 'cell_changed';

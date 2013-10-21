@@ -77,6 +77,12 @@ function init() {
 	}, false);
 	humacchina.setActiveColumn(activeColumnInput.value);
 
+	var activeScaleInput = document.getElementById('activeScale');
+	activeScaleInput.max = humacchina.getNumScales() - 1;
+	activeScaleInput.addEventListener('change', function(ev) {
+		humacchina.setActiveScale(activeScaleInput.value);
+	}, false);
+
 
 	// Generates a listener for a particular 'button' or 'quneo pad corner'
 	function getMatrixListener(row, column) {
