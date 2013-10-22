@@ -9,6 +9,7 @@ function Humacchina(audioContext, params) {
 	this.EVENT_ROW_PLAYED = 'row_played';
 	this.EVENT_END_PLAYED = 'end_played';
 	this.EVENT_NOTE_ON = 'note_on';
+	this.EVENT_NOTE_OFF = 'note_off';
 
 	var that = this;
 	var EventDispatcher = require('eventdispatcher.js');
@@ -73,7 +74,8 @@ function Humacchina(audioContext, params) {
 				numVoices: 1,
 				waveType: [ OscillatorVoice.WAVE_TYPE_SAWTOOTH ]
 			});
-			voice.adsr.release = 1;
+			voice.adsr.attack = 0;
+			voice.adsr.release = 0.5;
 			voice.output.connect(gainNode);
 			oscillators.push(voice);
 		}
@@ -147,6 +149,7 @@ function Humacchina(audioContext, params) {
 			}
 		}
 		
+		buildEventsList();
 		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
 	}
 
@@ -175,14 +178,26 @@ function Humacchina(audioContext, params) {
 				break;
 			}
 
-			if(currentEvent.type === that.EVENT_END_PLAYED) {
+			var eventType = currentEvent.type;
+
+			if(eventType === that.EVENT_END_PLAYED) {
 				loopStartTime = currentEventStart;
 				nextEventPosition = 0;
-				that.dispatchEvent(currentEvent);
 			} else {
-				that.dispatchEvent(currentEvent);
+				if(eventType === that.EVENT_NOTE_ON || eventType === that.EVENT_NOTE_OFF) {
+					var oscillator = oscillators[currentEvent.voice];
+
+					if(eventType === that.EVENT_NOTE_ON) {
+						var note = currentEvent.note;
+						oscillator.noteOn(note, 0.5);
+					} else {
+						oscillator.noteOff();
+					}
+				}
 				nextEventPosition++;
 			}
+
+		that.dispatchEvent(currentEvent);
 
 		} while (nextEventPosition < eventsList.length);
 	}
@@ -222,6 +237,8 @@ function Humacchina(audioContext, params) {
 
 				if(cell.transposed !== null) {
 					addEvent(t, that.EVENT_NOTE_ON, { voice: j, note: cell.transposed });
+					// Also adding an automatic note off event, a row later
+					addEvent(t + secondsPerRow * 0.5, that.EVENT_NOTE_OFF, { voice: j });
 				}
 			}
 

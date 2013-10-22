@@ -122,10 +122,14 @@ function init() {
 
 	humacchina.play();
 
+	humacchina.setActiveVoice(5);
+	for(var k = 0; k < 8; k++) {
+		humacchina.toggleCell(k, k);
+	}
 	
-	setTimeout(function() {
+	/*setTimeout(function() {
 		humacchina.stop();
-	}, 10000);
+	}, 10000);*/
 
 
 }
