@@ -51,11 +51,11 @@ function Humacchina(audioContext, params) {
 		EventDispatcher.call(that);
 
 		gainNode = audioContext.createGain();
-		scriptProcessorNode = audioContext.createScriptProcessor(2048);
+		scriptProcessorNode = audioContext.createScriptProcessor(4096);
 		scriptProcessorNode.onaudioprocess = audioProcessCallback;
 
 		setSamplingRate(audioContext.sampleRate);
-		setBPM(125);
+		setBPM(100);
 
 		for(i = 0; i < numRows; i++) {
 			var row = [];
@@ -72,10 +72,12 @@ function Humacchina(audioContext, params) {
 			var voice = new Bajotron(audioContext, {
 				octaves: [ 1 ],
 				numVoices: 1,
-				waveType: [ OscillatorVoice.WAVE_TYPE_SAWTOOTH ]
+				waveType: [ OscillatorVoice.WAVE_TYPE_SQUARE ]
 			});
 			voice.adsr.attack = 0;
-			voice.adsr.release = 0.5;
+			voice.adsr.decay = 0;
+			voice.adsr.sustain = 0.5;
+			voice.adsr.release = 0.25;
 			voice.output.connect(gainNode);
 			oscillators.push(voice);
 		}
@@ -83,6 +85,7 @@ function Humacchina(audioContext, params) {
 		setScale(scales.length ? scales[0] : null);
 
 		buildEventsList();
+
 	}
 
 
@@ -169,6 +172,8 @@ function Humacchina(audioContext, params) {
 		var now = audioContext.currentTime;
 		var frameEnd = now + bufferLength;
 
+		timePosition = now;
+
 		do {
 
 			var currentEvent = eventsList[nextEventPosition];
@@ -189,7 +194,7 @@ function Humacchina(audioContext, params) {
 
 					if(eventType === that.EVENT_NOTE_ON) {
 						var note = currentEvent.note;
-						oscillator.noteOn(note, 0.5);
+						oscillator.noteOn(note, 1.0 / oscillators.length);
 					} else {
 						oscillator.noteOff();
 					}
@@ -236,10 +241,11 @@ function Humacchina(audioContext, params) {
 				var cell = cells[i][j];
 
 				if(cell.transposed !== null) {
-					addEvent(t, that.EVENT_NOTE_ON, { voice: j, note: cell.transposed });
+					addEvent(t, that.EVENT_NOTE_ON, { voice: cell.column, note: cell.transposed });
 					// Also adding an automatic note off event, a row later
-					addEvent(t + secondsPerRow * 0.5, that.EVENT_NOTE_OFF, { voice: j });
+					addEvent(t + secondsPerRow * 0.5, that.EVENT_NOTE_OFF, { voice: cell.column });
 				}
+
 			}
 
 			t += secondsPerRow;
@@ -247,9 +253,11 @@ function Humacchina(audioContext, params) {
 
 		addEvent(t, that.EVENT_END_PLAYED);
 
-		eventsList.forEach(function(ev, index) {
+		updateNextEventPosition();
+
+		/*eventsList.forEach(function(ev, index) {
 			console.log(index, ev.timestamp, ev.type);
-		});
+		});*/
 	}
 
 
@@ -261,14 +269,25 @@ function Humacchina(audioContext, params) {
 	}
 
 
+	function updateNextEventPosition() {
+		if(nextEventPosition > eventsList.length) {
+			var pos = 0;
+			for(var i = 0; i < eventsList.length; i++) {
+				var ev = eventsList[i];
+				if(ev.timestamp + loopStartTime > timePosition) {
+					break;
+				}
+				pos = i;
+			}
+			nextEventPosition = pos;
+		}
+	}
 
 	//
 	
 	this.output = gainNode;
 	
 	this.play = function() {
-		// TODO
-		// oscillators[2].noteOn(48, 0.5, audioContext.currentTime);
 		scriptProcessorNode.connect(audioContext.destination);
 	};
 
@@ -281,7 +300,7 @@ function Humacchina(audioContext, params) {
 
 
 	this.toggleCell = function(row, step) {
-	
+
 		var cell = cells[step][activeVoiceIndex];
 		var newValue = row | 0;
 		var newNote = getScaledNote(newValue, activeVoiceIndex, currentScale.scale);
