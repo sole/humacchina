@@ -23,7 +23,8 @@ function init() {
 		]
 	});
 
-	humacchina.output.gain.value = 0.25;
+
+	//humacchina.output.gain.value = 0.25;
 	humacchina.output.connect(audioContext.destination);
 
 	humacchinaGUI.attachTo(humacchina);
@@ -126,6 +127,11 @@ function init() {
 	for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k);
 	}
+
+	var Oscilloscope = require('supergear').Oscilloscope;
+	var osc = new Oscilloscope(audioContext);
+	humacchina.output.connect(osc.input);
+	document.body.appendChild(osc.domElement);
 	
 	/*setTimeout(function() {
 		humacchina.stop();
