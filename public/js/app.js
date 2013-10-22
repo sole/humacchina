@@ -125,7 +125,7 @@ function init() {
 	
 	setTimeout(function() {
 		humacchina.stop();
-	}, 1000);
+	}, 10000);
 
 
 }

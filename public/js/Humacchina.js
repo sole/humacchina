@@ -2,6 +2,14 @@ function Humacchina(audioContext, params) {
 
 	'use strict';
 
+	this.EVENT_CELL_CHANGED = 'cell_changed';
+	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
+	this.EVENT_SCALE_CHANGED = 'scale_changed';
+
+	this.EVENT_ROW_PLAYED = 'row_played';
+	this.EVENT_END_PLAYED = 'end_played';
+	this.EVENT_NOTE_ON = 'note_on';
+
 	var that = this;
 	var EventDispatcher = require('eventdispatcher.js');
 	var OscillatorVoice = require('supergear').OscillatorVoice;
@@ -21,7 +29,7 @@ function Humacchina(audioContext, params) {
 	var scriptProcessorNode;
 
 	var bpm = 125;
-	var linesPerBeat = 4;
+	var linesPerBeat = 1;
 	var ticksPerLine = 12;
 	var secondsPerRow, secondsPerTick;
 	var samplingRate;
@@ -29,6 +37,7 @@ function Humacchina(audioContext, params) {
 	var eventsList = [];
 	var nextEventPosition = 0;
 	var timePosition = 0;
+	var loopStartTime = 0;
 
 	init();
 
@@ -70,6 +79,8 @@ function Humacchina(audioContext, params) {
 		}
 
 		setScale(scales.length ? scales[0] : null);
+
+		buildEventsList();
 	}
 
 
@@ -150,6 +161,30 @@ function Humacchina(audioContext, params) {
 			bufferLeft = buffer.getChannelData(0),
 			numSamples = bufferLeft.length;
 
+		var bufferLength = numSamples / samplingRate;
+
+		var now = audioContext.currentTime;
+		var frameEnd = now + bufferLength;
+
+		do {
+
+			var currentEvent = eventsList[nextEventPosition];
+			var currentEventStart = currentEvent.timestamp + loopStartTime;
+
+			if(currentEventStart >= frameEnd) {
+				break;
+			}
+
+			if(currentEvent.type === that.EVENT_END_PLAYED) {
+				loopStartTime = currentEventStart;
+				nextEventPosition = 0;
+				that.dispatchEvent(currentEvent);
+			} else {
+				that.dispatchEvent(currentEvent);
+				nextEventPosition++;
+			}
+
+		} while (nextEventPosition < eventsList.length);
 	}
 
 
@@ -179,7 +214,7 @@ function Humacchina(audioContext, params) {
 		
 		for(var i = 0; i < numRows; i++) {
 
-			addEvent(t, that.EVENT_ROW_PLAYED);
+			addEvent(t, that.EVENT_ROW_PLAYED, { row: i });
 
 			for(var j = 0; j < numColumns; j++) {
 				
@@ -193,6 +228,11 @@ function Humacchina(audioContext, params) {
 			t += secondsPerRow;
 		}
 
+		addEvent(t, that.EVENT_END_PLAYED);
+
+		eventsList.forEach(function(ev, index) {
+			console.log(index, ev.timestamp, ev.type);
+		});
 	}
 
 
@@ -286,13 +326,7 @@ function Humacchina(audioContext, params) {
 	};
 
 	
-	this.EVENT_CELL_CHANGED = 'cell_changed';
-	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
-	this.EVENT_SCALE_CHANGED = 'scale_changed';
-
-	this.EVENT_ROW_PLAYED = 'row_played';
-	this.EVENT_NOTE_ON = 'note_on';
-
+	
 }
 
 

@@ -101,6 +101,10 @@
 					that.setActiveVoice(ev.activeVoiceIndex);
 				});
 
+				humacchina.addEventListener(humacchina.EVENT_ROW_PLAYED, function(ev) {
+					that.setActiveRow(ev.row);
+				});
+
 				humacchina.addEventListener(humacchina.EVENT_SCALE_CHANGED, function(ev) {
 					for(var i = 0; i < that.rows; i++) {
 						for(var j = 0; j < that.columns; j++) {
