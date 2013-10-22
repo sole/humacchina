@@ -1,4 +1,5 @@
 function Humacchina(audioContext, params) {
+
 	'use strict';
 
 	var that = this;
@@ -17,6 +18,17 @@ function Humacchina(audioContext, params) {
 	var activeVoiceIndex = 0;
 
 	var gainNode;
+	var scriptProcessorNode;
+
+	var bpm = 125;
+	var linesPerBeat = 4;
+	var ticksPerLine = 12;
+	var secondsPerRow, secondsPerTick;
+	var samplingRate;
+	var inverseSamplingRate;
+	var eventsList = [];
+	var nextEventPosition = 0;
+	var timePosition = 0;
 
 	init();
 
@@ -29,6 +41,11 @@ function Humacchina(audioContext, params) {
 		EventDispatcher.call(that);
 
 		gainNode = audioContext.createGain();
+		scriptProcessorNode = audioContext.createScriptProcessor(2048);
+		scriptProcessorNode.onaudioprocess = audioProcessCallback;
+
+		setSamplingRate(audioContext.sampleRate);
+		setBPM(125);
 
 		for(i = 0; i < numRows; i++) {
 			var row = [];
@@ -93,6 +110,7 @@ function Humacchina(audioContext, params) {
 
 	}
 
+
 	function getColumnData(column) {
 		var out = [];
 		for(var i = 0; i < numRows; i++) {
@@ -100,6 +118,7 @@ function Humacchina(audioContext, params) {
 		}
 		return out;
 	}
+
 
 	function setScale(scale) {
 		// TODO what if scale = null
@@ -120,25 +139,90 @@ function Humacchina(audioContext, params) {
 		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
 	}
 
+
+	function getScaledNote(value, voiceIndex, scale) {
+		return baseNote + 12 * voiceIndex + getTransposed(value, scale);
+	}
+	
+
+	function audioProcessCallback(ev) {
+		var buffer = ev.outputBuffer,
+			bufferLeft = buffer.getChannelData(0),
+			numSamples = bufferLeft.length;
+
+	}
+
+
+	function setSamplingRate(rate) {
+		samplingRate = rate;
+		inverseSamplingRate = 1.0 / rate;
+	}
+
+
+	function setBPM(value) {
+		bpm = 125;
+		updateRowTiming();
+	}
+
+
+	function updateRowTiming() {
+		secondsPerRow = 60.0 / (linesPerBeat * bpm);
+		secondsPerTick = secondsPerRow / ticksPerLine;
+	}
+
+	// This is relatively simple as we only have ONE pattern in this macchine
+	function buildEventsList() {
+		
+		eventsList.length = 0;
+
+		var t = 0;
+		
+		for(var i = 0; i < numRows; i++) {
+
+			addEvent(t, that.EVENT_ROW_PLAYED);
+
+			for(var j = 0; j < numColumns; j++) {
+				
+				var cell = cells[i][j];
+
+				if(cell.transposed !== null) {
+					addEvent(t, that.EVENT_NOTE_ON, { voice: j, note: cell.transposed });
+				}
+			}
+
+			t += secondsPerRow;
+		}
+
+	}
+
+
+	function addEvent(timestamp, type, data) {
+		data = data || {};
+		data.timestamp = timestamp;
+		data.type = type;
+		eventsList.push(data);
+	}
+
+
+
 	//
 	
 	this.output = gainNode;
 	
 	this.play = function() {
 		// TODO
-		oscillators[2].noteOn(48, 0.5, audioContext.currentTime);
+		// oscillators[2].noteOn(48, 0.5, audioContext.currentTime);
+		scriptProcessorNode.connect(audioContext.destination);
 	};
 
 	this.stop = function() {
 		oscillators.forEach(function(osc) {
 			osc.noteOff();
 		});
+		scriptProcessorNode.disconnect();
 	};
 
-	function getScaledNote(value, voiceIndex, scale) {
-		return baseNote + 12 * voiceIndex + getTransposed(value, scale);
-	}
-	
+
 	this.toggleCell = function(row, step) {
 	
 		var cell = cells[step][activeVoiceIndex];
@@ -162,6 +246,8 @@ function Humacchina(audioContext, params) {
 		}
 
 		that.dispatchEvent({ type: that.EVENT_CELL_CHANGED, row: step, column: activeVoiceIndex, transposed: cell.transposed, noteName: cell.noteName });
+
+		buildEventsList();
 
 	};
 
@@ -203,6 +289,9 @@ function Humacchina(audioContext, params) {
 	this.EVENT_CELL_CHANGED = 'cell_changed';
 	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
 	this.EVENT_SCALE_CHANGED = 'scale_changed';
+
+	this.EVENT_ROW_PLAYED = 'row_played';
+	this.EVENT_NOTE_ON = 'note_on';
 
 }
 
