@@ -50,7 +50,6 @@ function Humacchina(audioContext, params) {
 
 		EventDispatcher.call(that);
 
-		// gainNode = audioContext.createGain();
 		gainNode = audioContext.createDynamicsCompressor();
 		scriptProcessorNode = audioContext.createScriptProcessor(1024);
 		scriptProcessorNode.onaudioprocess = audioProcessCallback;
@@ -191,6 +190,7 @@ function Humacchina(audioContext, params) {
 				nextEventPosition = 0;
 			} else {
 				if(eventType === that.EVENT_NOTE_ON || eventType === that.EVENT_NOTE_OFF) {
+					console.log('send note in', currentEvent.voice);
 					var oscillator = oscillators[currentEvent.voice];
 					var oscEventTime = Math.max(0, currentEventStart - now);
 
@@ -204,7 +204,7 @@ function Humacchina(audioContext, params) {
 				nextEventPosition++;
 			}
 
-		that.dispatchEvent(currentEvent);
+			that.dispatchEvent(currentEvent);
 
 		} while (nextEventPosition < eventsList.length);
 	}
@@ -226,6 +226,7 @@ function Humacchina(audioContext, params) {
 		secondsPerRow = 60.0 / (linesPerBeat * bpm);
 		secondsPerTick = secondsPerRow / ticksPerLine;
 	}
+
 
 	// This is relatively simple as we only have ONE pattern in this macchine
 	function buildEventsList() {
@@ -257,9 +258,6 @@ function Humacchina(audioContext, params) {
 
 		updateNextEventPosition();
 
-		/*eventsList.forEach(function(ev, index) {
-			console.log(index, ev.timestamp, ev.type);
-		});*/
 	}
 
 
@@ -288,10 +286,12 @@ function Humacchina(audioContext, params) {
 	//
 	
 	this.output = gainNode;
-	
+
+
 	this.play = function() {
 		scriptProcessorNode.connect(audioContext.destination);
 	};
+
 
 	this.stop = function() {
 		oscillators.forEach(function(osc) {
@@ -329,22 +329,27 @@ function Humacchina(audioContext, params) {
 
 	};
 
+
 	this.getCell = function(row, column) {
 		return cells[row][column];
 	};
 
+
 	this.getActiveVoice = function() {
 		return activeVoiceIndex;
 	};
+
 
 	this.setActiveVoice = function(value) {
 		activeVoiceIndex = parseInt(value, 10);
 		that.dispatchEvent({ type: that.EVENT_ACTIVE_VOICE_CHANGED, activeVoiceIndex: value });
 	};
 
+
 	this.getActiveVoiceData = function() {
 		return getColumnData(activeVoiceIndex);
 	};
+
 
 	this.getCurrentScaleNotes = function() {
 		var out = [];
@@ -355,9 +360,11 @@ function Humacchina(audioContext, params) {
 		return out;
 	};
 
+
 	this.getNumScales = function() {
 		return scales.length;
 	};
+
 
 	this.setActiveScale = function(index) {
 		setScale(scales[index]);

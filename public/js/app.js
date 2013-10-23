@@ -24,7 +24,6 @@ function init() {
 	});
 
 
-	//humacchina.output.gain.value = 0.25;
 	humacchina.output.connect(audioContext.destination);
 
 	humacchinaGUI.attachTo(humacchina);
@@ -94,6 +93,7 @@ function init() {
 		};
 	}
 
+
 	function redrawMatrix() {
 
 		var scaleNotes = matrix.querySelectorAll('.scaleNote');
@@ -114,7 +114,9 @@ function init() {
 				matrixInputs[cell.value][row].checked = true;
 			}
 		});
+
 	}
+
 
 	function toggleNote(row, step) {
 		humacchina.toggleCell(row, step);
@@ -127,6 +129,8 @@ function init() {
 	for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k);
 	}
+	humacchina.setActiveVoice(3);
+	humacchina.toggleCell(4, 4);
 
 	var Oscilloscope = require('supergear').Oscilloscope;
 	var osc = new Oscilloscope(audioContext);
