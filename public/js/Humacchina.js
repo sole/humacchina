@@ -394,6 +394,11 @@ function Humacchina(audioContext, params) {
 		return activeScale;
 	};
 
+	this.setBPM = function(v) {
+		setBPM(v);
+		buildEventsList();
+	};
+
 	
 	
 }

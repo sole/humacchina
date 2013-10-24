@@ -321,6 +321,14 @@ function init() {
 			}
 		});
 
+		osc.on(prefix + 'hSliders/0/location', null, function(m, value) {
+			console.log('slider', value);
+			// goes from 0 to 127
+			var v = parseInt(value, 10) / 127.0;
+			var newBPM = 50 + v * 250;
+			humacchina.setBPM(newBPM);
+		});
+
 	}
 
 	// Flash LEDs on / off a couple of times
