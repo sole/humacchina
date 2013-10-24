@@ -156,7 +156,8 @@ function Humacchina(audioContext, params) {
 		}
 		
 		buildEventsList();
-		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scale });
+		var scaleIndex = scales.indexOf(scale);
+		that.dispatchEvent({ type: that.EVENT_SCALE_CHANGED, scale: scaleIndex });
 	}
 
 
