@@ -4,6 +4,12 @@ function init() {
 		return;
 	}
 
+	var Orxatron = require('./Orxatron');
+	var osc = new Orxatron.OSC();
+
+	osc.connect('http://localhost:7777');
+	setupOSC(osc);
+
 	var humacchinaGUI = document.querySelector('humacchina-gui');
 
 	var audioContext = new AudioContext();
@@ -144,6 +150,127 @@ function init() {
 		humacchina.stop();
 	}, 10000);*/
 
+
+	// This is gonna hurt >_<
+	function setupOSC(osc) {
+		var mappings = [
+			// ROW 0
+			'hSliders/0/note_velocity', // 0 (Pad 0)
+			'hSliders/1/note_velocity',
+			
+			'hSliders/2/note_velocity',
+			'hSliders/3/note_velocity',
+			
+			'rotary/0/note_velocity',	// 4 (Pad 2)
+			'rotary/1/note_velocity',
+			
+			'vSliders/0/note_velocity',
+			'vSliders/1/note_velocity',
+			
+			// ROW 1
+			'vSliders/2/note_velocity', // 8
+			'vSliders/3/note_velocity',
+			
+			'longSlider/note_velocity',
+			'leftButton/0/note_velocity',
+
+			'rightButton/0/note_velocity',
+			'leftButton/1/note_velocity',
+
+			'rightButton/1/note_velocity',
+			'leftButton/2/note_velocity',
+
+			// ROW 2
+			'rightButton/2/note_velocity',
+			'leftButton/3/note_velocity',
+			
+			'rightButton/3/note_velocity',
+			'rhombus/note_velocity',
+
+			'upButton/0/note_velocity',
+			'downButton/0/note_velocity',
+
+			'upButton/1/note_velocity',
+			'downButton/1/note_velocity',
+
+			// ROW 3
+			'transport/0/note_velocity',
+			'transport/1/note_velocity',
+
+			'transport/2/note_velocity',
+			'pads/1/drum/x',
+
+			'pads/1/drum/y',
+			'pads/2/drum/pressure',
+
+			'pads/2/drum/x',
+			'pads/2/drum/y',
+
+			// ROW 4
+			'pads/3/drum/pressure',
+			'pads/3/drum/x',
+
+			'pads/3/drum/y',
+			'pads/4/drum/pressure',
+
+			'pads/0/drum/note_velocity',
+			'pads/1/drum/note_velocity',
+
+			'pads/2/drum/note_velocity',
+			'pads/3/drum/note_velocity',
+
+			// ROW 5
+			'pads/4/drum/note_velocity',
+			'pads/5/drum/note_velocity',
+
+			'pads/6/drum/note_velocity',
+			'pads/7/drum/note_velocity',
+
+			'pads/8/drum/note_velocity',
+			'pads/9/drum/note_velocity',
+
+			'pads/10/drum/note_velocity',
+			'pads/11/drum/note_velocity',
+
+			// ROW 6
+			'pads/12/drum/note_velocity',
+			'pads/13/drum/note_velocity',
+
+			'pads/14/drum/note_velocity',
+			'pads/15/drum/note_velocity',
+
+			'pads/9/drum/y',
+			'pads/10/drum/pressure',
+
+			'pads/10/drum/x',
+			'pads/10/drum/y',
+
+			// ROW 7
+			'pads/11/drum/pressure',
+			'pads/11/drum/x',
+
+			'pads/11/drum/y',
+			'pads/12/drum/pressure',
+
+			'pads/12/drum/x',
+			'pads/12/drum/y',
+
+			'pads/13/drum/pressure',
+			'pads/13/drum/x'
+
+		];
+
+		var prefix = '/quneo/';
+
+		mappings.forEach(function(path, index) {
+			
+			var fullPath = prefix + path;
+			osc.on(fullPath, null, function(match, value) {
+				// console.log(match, index, value);
+				console.log('pressed button ' + index);
+			});
+		});
+	}
 
 }
 

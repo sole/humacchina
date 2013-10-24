@@ -69,15 +69,17 @@ function Humacchina(audioContext, params) {
 
 
 		for(i = 0; i < numColumns; i++) {
+
 			var voice = new Bajotron(audioContext, {
-				octaves: [ 2 ],
+				octaves: [ 3 ],
 				numVoices: 1,
 				waveType: [ OscillatorVoice.WAVE_TYPE_SQUARE ]
 			});
+
 			voice.adsr.attack = 0.0;
 			voice.adsr.decay = secondsPerRow * 0.75;
-			voice.adsr.sustain = 0;
-			voice.adsr.release = 0;
+			voice.adsr.sustain = 0.2;
+			voice.adsr.release = 0.2;
 			voice.output.connect(gainNode);
 			oscillators.push(voice);
 		}
