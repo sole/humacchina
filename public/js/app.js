@@ -5,6 +5,7 @@ function init() {
 	}
 
 	var Orxatron = require('./Orxatron');
+	var Quneo = require('quneo');
 	var osc = new Orxatron.OSC();
 
 	osc.connect('http://localhost:7777');
@@ -262,12 +263,23 @@ function init() {
 
 		var prefix = '/quneo/';
 
+		// Set all LEDs off
+		for(var i = 0; i < mappings.length; i++) {
+			osc.send(Quneo.getLedPath(i, 'green'), 0);
+			osc.send(Quneo.getLedPath(i, 'red'), 0);
+		}
+
 		mappings.forEach(function(path, index) {
 			
 			var fullPath = prefix + path;
 			osc.on(fullPath, null, function(match, value) {
 				// console.log(match, index, value);
 				console.log('pressed button ' + index);
+
+				var onOff = value === 0 ? 0 : 127;
+
+				osc.send(Quneo.getLedPath(index, 'green'), onOff);
+
 			});
 		});
 	}
