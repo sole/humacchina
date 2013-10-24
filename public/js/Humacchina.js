@@ -173,25 +173,29 @@ function Humacchina(audioContext, params) {
 		var frameEnd = now + bufferLength;
 
 		timePosition = now;
-
+		
 		do {
 
 			var currentEvent = eventsList[nextEventPosition];
 			var currentEventStart = currentEvent.timestamp + loopStartTime;
 
 			if(currentEventStart >= frameEnd) {
-				break;
+				return;
 			}
 
 			var eventType = currentEvent.type;
 
 			if(eventType === that.EVENT_END_PLAYED) {
+
 				loopStartTime = currentEventStart;
 				nextEventPosition = 0;
+
 			} else {
-				if(eventType === that.EVENT_NOTE_ON || eventType === that.EVENT_NOTE_OFF) {
-					console.log('send note in', currentEvent.voice);
-					var oscillator = oscillators[currentEvent.voice];
+
+				if( eventType === that.EVENT_NOTE_ON || 
+					eventType === that.EVENT_NOTE_OFF ) {
+					
+						var oscillator = oscillators[currentEvent.voice];
 					var oscEventTime = Math.max(0, currentEventStart - now);
 
 					if(eventType === that.EVENT_NOTE_ON) {
@@ -201,7 +205,9 @@ function Humacchina(audioContext, params) {
 						oscillator.noteOff(null, oscEventTime);
 					}
 				}
+			
 				nextEventPosition++;
+
 			}
 
 			that.dispatchEvent(currentEvent);
@@ -244,9 +250,9 @@ function Humacchina(audioContext, params) {
 				var cell = cells[i][j];
 
 				if(cell.transposed !== null) {
-					addEvent(t, that.EVENT_NOTE_ON, { voice: cell.column, note: cell.transposed });
+					addEvent(t, that.EVENT_NOTE_ON, { voice: j, note: cell.transposed });
 					// Also adding an automatic note off event, a row later
-					addEvent(t + secondsPerRow * 0.5, that.EVENT_NOTE_OFF, { voice: cell.column });
+					addEvent(t + secondsPerRow * 0.5, that.EVENT_NOTE_OFF, { voice: j });
 				}
 
 			}
@@ -255,6 +261,10 @@ function Humacchina(audioContext, params) {
 		}
 
 		addEvent(t, that.EVENT_END_PLAYED);
+
+		eventsList.sort(function(a, b) {
+			return a.timestamp - b.timestamp;
+		});
 
 		updateNextEventPosition();
 

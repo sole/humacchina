@@ -132,6 +132,9 @@ function init() {
 	humacchina.setActiveVoice(3);
 	humacchina.toggleCell(4, 4);
 
+	humacchina.setActiveVoice(6);
+	humacchina.toggleCell(4, 4);
+
 	var Oscilloscope = require('supergear').Oscilloscope;
 	var osc = new Oscilloscope(audioContext);
 	humacchina.output.connect(osc.input);
