@@ -113,6 +113,7 @@ function init() {
 		var inputs = matrix.querySelectorAll('input');
 		for(var i = 0; i < inputs.length; i++) {
 			inputs[i].checked = false;
+			flashLedByIndex(i, 0, 0);
 		}
 
 		var activeVoice = humacchina.getActiveVoice();
@@ -120,6 +121,7 @@ function init() {
 		data.forEach(function(cell, row) {
 			if(cell.value !== null) {
 				matrixInputs[cell.value][row].checked = true;
+				flashLed(cell.value, row, 1, 0);
 			}
 		});
 
@@ -274,34 +276,29 @@ function init() {
 		];
 
 		var prefix = '/quneo/';
-
 		
-		/*for(var i = 0; i < 16; i++) {
-			osc.send(Quneo.getPadLedsPath(i, 'green'), 0);
-			osc.send(Quneo.getPadLedsPath(i, 'red'), 0);
-		}*/
-
+		
 		// pads -> pressure == 127, 
 
 		mappings.forEach(function(path, index) {
 			
-			var row = (index / 4) | 0;
-			var column = index % 4;
+			var row = (index / 8) | 0; // uuhhh hardcoded values uuh
+			var column = index % 8;
 			var fullPath = prefix + path;
 			var listener = getMatrixListener(row, column);
 
 			osc.on(fullPath, null, function(match, value) {
 				
-				console.log(fullPath, 'pressed button ' + index, value);
+				console.log(fullPath, Date.now(), 'pressed button ' + index, value);
 
-				if(true || value > 127) {
+				//if(/*true || */value > 127) {
 					listener();
 	
-					var onOff = value === 0 ? 0 : 127;
+					/*var onOff = value === 0 ? 0 : 127;
 
 					osc.send(Quneo.getLedPath(index, 'green'), onOff);
-					console.log('hey');
-				}
+					console.log('hey');*/
+				//}
 
 
 			});
@@ -360,12 +357,23 @@ function init() {
 				osc.send(Quneo.getLedPath(j, 'green'), green);
 				osc.send(Quneo.getLedPath(j, 'red'), red);
 			}
+			
 			for(j = 0; j < 16; j++) {
 				osc.send(Quneo.getPadLedsPath(j, 'green'), green);
 				osc.send(Quneo.getPadLedsPath(j, 'red'), red);
 			}
 		}
+	}
 
+	function flashLedByIndex(index, red, green) {
+		osc.send(Quneo.getLedPath(index, 'green'), green);
+		osc.send(Quneo.getLedPath(index, 'red'), red);
+	}
+
+	function flashLed(row, column, red, green) {
+		var j = row * humacchinaGUI.rows + column;
+		console.log(row, column, j);
+		flashLedByIndex(j, red, green);
 	}
 
 }
