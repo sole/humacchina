@@ -347,6 +347,11 @@ function Humacchina(audioContext, params) {
 	};
 
 
+	this.getNumVoices = function() {
+		return oscillators.length;
+	};
+
+
 	this.getActiveVoice = function() {
 		return activeVoiceIndex;
 	};

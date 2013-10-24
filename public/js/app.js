@@ -129,6 +129,12 @@ function init() {
 		humacchina.toggleCell(row, step);
 	}
 
+	function changeActiveVoice(relativeValue) {
+		var currentVoice = humacchina.getActiveVoice();
+		var nextVoice = Math.max(0, currentVoice + relativeValue) % humacchina.getNumVoices();
+		humacchina.setActiveVoice(nextVoice);
+
+	}
 
 	humacchina.play();
 
@@ -143,9 +149,9 @@ function init() {
 	humacchina.toggleCell(4, 4);
 
 	var Oscilloscope = require('supergear').Oscilloscope;
-	var osc = new Oscilloscope(audioContext);
-	humacchina.output.connect(osc.input);
-	document.body.appendChild(osc.domElement);
+	var osci = new Oscilloscope(audioContext);
+	humacchina.output.connect(osci.input);
+	document.body.appendChild(osci.domElement);
 	
 	/*setTimeout(function() {
 		humacchina.stop();
@@ -269,18 +275,42 @@ function init() {
 			osc.send(Quneo.getLedPath(i, 'red'), 0);
 		}
 
+		// pads -> pressure == 127, 
+
 		mappings.forEach(function(path, index) {
 			
+			var row = (index / 4) | 0;
+			var column = index % 4;
 			var fullPath = prefix + path;
+			var listener = getMatrixListener(row, column);
+
 			osc.on(fullPath, null, function(match, value) {
-				// console.log(match, index, value);
-				console.log('pressed button ' + index);
+				
+				console.log(fullPath, 'pressed button ' + index, value);
 
-				var onOff = value === 0 ? 0 : 127;
+				if(true || value > 127) {
+					listener();
+	
+					var onOff = value === 0 ? 0 : 127;
 
-				osc.send(Quneo.getLedPath(index, 'green'), onOff);
+					osc.send(Quneo.getLedPath(index, 'green'), onOff);
+					console.log('hey');
+				}
+
 
 			});
+		});
+
+		osc.on(prefix + 'upButton/0/pressure', null, function(match, value) {
+			if(value > 0) {
+				changeActiveVoice(+1);
+			}
+		});
+
+		osc.on(prefix + 'downButton/0/pressure', null, function(match, value) {
+			if(value > 0) {
+				changeActiveVoice(-1);
+			}
 		});
 	}
 
