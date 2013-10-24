@@ -70,7 +70,7 @@ function init() {
 		redrawMatrix();
 	});
 
-	humacchina.addEventListener(humacchina.EVENT_ACTIVE_COLUMN_CHANGED, function(ev) {
+	humacchina.addEventListener(humacchina.EVENT_ACTIVE_VOICE_CHANGED, function(ev) {
 		redrawMatrix();
 	});
 
@@ -162,6 +162,7 @@ function init() {
 	document.body.appendChild(osci.domElement);
 
 	hardwareTest(function() {
+		redrawMatrix();
 		humacchina.play();
 	});
 
@@ -290,17 +291,9 @@ function init() {
 			osc.on(fullPath, null, function(match, value) {
 				
 				console.log(fullPath, Date.now(), 'pressed button ' + index, value);
+				listener();
 
-				//if(/*true || */value > 127) {
-					listener();
-	
-					/*var onOff = value === 0 ? 0 : 127;
-
-					osc.send(Quneo.getLedPath(index, 'green'), onOff);
-					console.log('hey');*/
-				//}
-
-
+					
 			});
 		});
 
@@ -333,6 +326,7 @@ function init() {
 	// Flash LEDs on / off a couple of times
 	function hardwareTest(doneCallback) {
 		var flashed = 0;
+		var flashLength = 800;
 		var flashInterval = setInterval(function() {
 
 			flashPads(0, 1);
@@ -345,10 +339,10 @@ function init() {
 			} else {
 				setTimeout(function() {
 					flashPads(1, 0);
-				}, 500);
+				}, flashLength / 2);
 			}
 
-		}, 1000);
+		}, flashLength);
 
 		function flashPads(red, green) {
 			var j;
@@ -372,7 +366,6 @@ function init() {
 
 	function flashLed(row, column, red, green) {
 		var j = row * humacchinaGUI.rows + column;
-		console.log(row, column, j);
 		flashLedByIndex(j, red, green);
 	}
 

@@ -10,3 +10,7 @@ body {
 humacchina-gui {
 	display: inline-block;
 }
+
+humacchina-gui td, humacchina-gui tr {
+	transition: 0.8s background;
+}
