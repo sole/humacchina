@@ -354,9 +354,15 @@ function init() {
 		}, 1000);
 
 		function flashPads(red, green) {
-			for(var j = 0; j < 64; j++) {
+			var j;
+
+			for(j = 0; j < 64; j++) {
 				osc.send(Quneo.getLedPath(j, 'green'), green);
 				osc.send(Quneo.getLedPath(j, 'red'), red);
+			}
+			for(j = 0; j < 16; j++) {
+				osc.send(Quneo.getPadLedsPath(j, 'green'), green);
+				osc.send(Quneo.getPadLedsPath(j, 'red'), red);
 			}
 		}
 
