@@ -55,7 +55,7 @@ function Humacchina(audioContext, params) {
 		scriptProcessorNode.onaudioprocess = audioProcessCallback;
 
 		setSamplingRate(audioContext.sampleRate);
-		setBPM(125);
+		setBPM(200);
 
 		for(i = 0; i < numRows; i++) {
 			var row = [];
