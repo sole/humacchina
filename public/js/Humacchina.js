@@ -24,6 +24,7 @@ function Humacchina(audioContext, params) {
 	var oscillators = [];
 	var cells = [];
 	var currentScale = null;
+	var activeScale = 0;
 	var activeVoiceIndex = 0;
 
 	var gainNode;
@@ -384,7 +385,12 @@ function Humacchina(audioContext, params) {
 
 
 	this.setActiveScale = function(index) {
-		setScale(scales[index]);
+		activeScale = parseInt(index, 10);
+		setScale(scales[activeScale]);
+	};
+
+	this.getActiveScale = function() {
+		return activeScale;
 	};
 
 	

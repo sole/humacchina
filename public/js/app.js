@@ -75,6 +75,7 @@ function init() {
 	});
 
 	humacchina.addEventListener(humacchina.EVENT_SCALE_CHANGED, function(ev) {
+		activeScaleInput.value = ev.scale;
 		redrawMatrix();
 	});
 
@@ -129,14 +130,19 @@ function init() {
 		humacchina.toggleCell(row, step);
 	}
 
+
 	function changeActiveVoice(relativeValue) {
 		var currentVoice = humacchina.getActiveVoice();
 		var nextVoice = Math.max(0, currentVoice + relativeValue) % humacchina.getNumVoices();
 		humacchina.setActiveVoice(nextVoice);
-
 	}
 
-	humacchina.play();
+
+	function changeActiveScale(relativeValue) {
+		var currentValue = humacchina.getActiveScale();
+		var nextValue = Math.max(0, currentValue + relativeValue) % humacchina.getNumScales();
+		humacchina.setActiveScale(nextValue);
+	}
 
 	humacchina.setActiveVoice(5);
 	for(var k = 0; k < 8; k++) {
@@ -152,10 +158,10 @@ function init() {
 	var osci = new Oscilloscope(audioContext);
 	humacchina.output.connect(osci.input);
 	document.body.appendChild(osci.domElement);
-	
-	/*setTimeout(function() {
-		humacchina.stop();
-	}, 10000);*/
+
+	hardwareTest(function() {
+		humacchina.play();
+	});
 
 
 	// This is gonna hurt >_<
@@ -269,11 +275,11 @@ function init() {
 
 		var prefix = '/quneo/';
 
-		// Set all LEDs off
-		for(var i = 0; i < mappings.length; i++) {
-			osc.send(Quneo.getLedPath(i, 'green'), 0);
-			osc.send(Quneo.getLedPath(i, 'red'), 0);
-		}
+		
+		/*for(var i = 0; i < 16; i++) {
+			osc.send(Quneo.getPadLedsPath(i, 'green'), 0);
+			osc.send(Quneo.getPadLedsPath(i, 'red'), 0);
+		}*/
 
 		// pads -> pressure == 127, 
 
@@ -312,6 +318,48 @@ function init() {
 				changeActiveVoice(-1);
 			}
 		});
+
+		osc.on(prefix + 'upButton/1/pressure', null, function(match, value) {
+			if(value > 0) {
+				changeActiveScale(+1);
+			}
+		});
+
+		osc.on(prefix + 'downButton/1/pressure', null, function(match, value) {
+			if(value > 0) {
+				changeActiveScale(-1);
+			}
+		});
+
+	}
+
+	// Flash LEDs on / off a couple of times
+	function hardwareTest(doneCallback) {
+		var flashed = 0;
+		var flashInterval = setInterval(function() {
+
+			flashPads(0, 1);
+
+			flashed++;
+			if(flashed > 4) {
+				clearInterval(flashInterval);
+				flashPads(0, 0);
+				doneCallback();
+			} else {
+				setTimeout(function() {
+					flashPads(1, 0);
+				}, 500);
+			}
+
+		}, 1000);
+
+		function flashPads(red, green) {
+			for(var j = 0; j < 64; j++) {
+				osc.send(Quneo.getLedPath(j, 'green'), green);
+				osc.send(Quneo.getLedPath(j, 'red'), red);
+			}
+		}
+
 	}
 
 }
