@@ -5,11 +5,15 @@ function Humacchina(audioContext, params) {
 	this.EVENT_CELL_CHANGED = 'cell_changed';
 	this.EVENT_ACTIVE_VOICE_CHANGED = 'active_voice_changed';
 	this.EVENT_SCALE_CHANGED = 'scale_changed';
+	this.EVENT_BPM_CHANGED = 'bpm_changed';
 
 	this.EVENT_ROW_PLAYED = 'row_played';
 	this.EVENT_END_PLAYED = 'end_played';
 	this.EVENT_NOTE_ON = 'note_on';
 	this.EVENT_NOTE_OFF = 'note_off';
+
+	this.minBPM = 50;
+	this.maxBPM = 250;
 
 	var that = this;
 	var EventDispatcher = require('eventdispatcher.js');
@@ -227,8 +231,9 @@ function Humacchina(audioContext, params) {
 
 
 	function setBPM(value) {
-		bpm = value;
+		bpm = Math.floor(value);
 		updateRowTiming();
+		that.dispatchEvent({ type: that.EVENT_BPM_CHANGED, bpm: bpm });
 	}
 
 
@@ -405,6 +410,16 @@ function Humacchina(audioContext, params) {
 		});
 	};
 	
+	this.getADSRParams = function() {
+		// just return current values for the first OSC
+		var keys = ['attack', 'decay', 'sustain', 'release'];
+		var out = {};
+		var adsr = oscillators[0].adsr;
+		keys.forEach(function(k) {
+			out[k] = adsr[k];
+		});
+		return out;
+	};
 }
 
 

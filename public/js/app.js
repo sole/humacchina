@@ -79,6 +79,21 @@ function init() {
 		redrawMatrix();
 	});
 
+	humacchina.addEventListener(humacchina.EVENT_BPM_CHANGED, function(ev) {
+		var mapped = (ev.bpm - humacchina.minBPM) / (humacchina.maxBPM - humacchina.minBPM);
+		var numLeds = 7;
+		var maxLed = Math.round(mapped * numLeds);
+		var i;
+
+		for(i = 0; i < maxLed; i++) {
+			osc.send('/quneo/leds/hSliders/0/' + i, 1.0);
+		}
+
+		for(i = maxLed; i < numLeds; i++) {
+			osc.send('/quneo/leds/hSliders/0/' + i, 0.0);
+		}
+	});
+
 	var activeVoiceInput = document.getElementById('activeVoice');
 	activeVoiceInput.addEventListener('change', function(ev) {
 		humacchina.setActiveVoice(activeVoiceInput.value);
@@ -151,6 +166,11 @@ function init() {
 
 	function changeADSRParam(paramIndex, value) {
 		var param = adsrParams[paramIndex];
+
+		if(paramIndex !== 2) { // sustain
+			value *= 3.0;
+		}
+
 		humacchina.setADSRParam(param, value);
 	}
 
@@ -175,6 +195,7 @@ function init() {
 
 	hardwareTest(function() {
 		redrawMatrix();
+		humacchina.setBPM(125);
 		humacchina.play();
 	});
 
@@ -333,10 +354,12 @@ function init() {
 			}
 		});
 
-		osc.on(prefix + 'hSliders/0/location', null, function(m, value) {
-			console.log('slider', value);
+		// QuNeo in grid mode is pretty f*ckd up or maybe I don't understand
+		// how the whole controllers thing works.
+		//osc.on(prefix + 'hSliders/0/location', null, function(m, value) {
+		osc.on(prefix + 'pads/14/drum/pressure', null, function(m, value) {
 			var v = midiValueToFloat(value);
-			var newBPM = 50 + v * 250;
+			var newBPM = humacchina.minBPM + v * (humacchina.maxBPM - humacchina.minBPM);
 			humacchina.setBPM(newBPM);
 		});
 
