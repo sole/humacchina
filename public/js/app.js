@@ -4,6 +4,8 @@ function init() {
 		return;
 	}
 
+	var debug = false;
+
 	var Orxatron = require('./Orxatron');
 	var Quneo = require('quneo');
 	var osc = new Orxatron.OSC();
@@ -188,10 +190,15 @@ function init() {
 	humacchina.setActiveVoice(6);
 	humacchina.toggleCell(4, 4);
 
-	var Oscilloscope = require('supergear').Oscilloscope;
-	var osci = new Oscilloscope(audioContext);
-	humacchina.output.connect(osci.input);
-	document.body.appendChild(osci.domElement);
+	if(debug) {
+		var Oscilloscope = require('supergear').Oscilloscope;
+		var osci = new Oscilloscope(audioContext);
+		humacchina.output.connect(osci.input);
+		document.body.appendChild(osci.domElement);
+	} else {
+		var quneo = document.getElementById('quneo');
+		quneo.style.display = 'none';
+	}
 
 	hardwareTest(function() {
 		redrawMatrix();
