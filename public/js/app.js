@@ -146,6 +146,18 @@ function init() {
 		humacchina.setActiveScale(nextValue);
 	}
 
+
+	var adsrParams = [ 'attack', 'decay', 'sustain', 'release' ];
+
+	function changeADSRParam(paramIndex, value) {
+		var param = adsrParams[paramIndex];
+		humacchina.setADSRParam(param, value);
+	}
+
+	function midiValueToFloat(v) {
+		return parseInt(v, 10) / 127.0;
+	}
+
 	humacchina.setActiveVoice(5);
 	for(var k = 0; k < 8; k++) {
 		humacchina.toggleCell(k, k);
@@ -323,13 +335,21 @@ function init() {
 
 		osc.on(prefix + 'hSliders/0/location', null, function(m, value) {
 			console.log('slider', value);
-			// goes from 0 to 127
-			var v = parseInt(value, 10) / 127.0;
+			var v = midiValueToFloat(value);
 			var newBPM = 50 + v * 250;
 			humacchina.setBPM(newBPM);
 		});
 
+		osc.on(prefix + 'vSliders/(\\d)/location', null, function(match, value) {
+			if(match && match.length > 1) {
+				var sliderIndex = parseInt(match[1], 10);
+				var normalisedValue = midiValueToFloat(value);
+				changeADSRParam(sliderIndex, normalisedValue);
+			}
+		});
 	}
+
+	
 
 	// Flash LEDs on / off a couple of times
 	function hardwareTest(doneCallback) {

@@ -399,7 +399,11 @@ function Humacchina(audioContext, params) {
 		buildEventsList();
 	};
 
-	
+	this.setADSRParam = function(param, value) {
+		oscillators.forEach(function(osci) {
+			osci.adsr[param] = value;
+		});
+	};
 	
 }
 
