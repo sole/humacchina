@@ -1,5 +1,5 @@
 body {
-	font-size: 2rem;
+	font-size: 3rem;
 }
 
 #quneo {
@@ -9,6 +9,14 @@ body {
 
 humacchina-gui {
 	display: inline-block;
+}
+
+humacchina-gui table {
+	width: 100%;
+}
+
+humacchina-gui table td {
+	width: 12.5%;
 }
 
 humacchina-gui td, humacchina-gui tr {
